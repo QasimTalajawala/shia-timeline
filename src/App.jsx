@@ -11,7 +11,7 @@ const BAR_GAP  = 4;
 const SUB_H    = 12;   // companion sub-row bar height
 const ROW_H    = BAR_H + BAR_GAP;
 const SUB_ROW_H = SUB_H + 3;
-const EVT_ZONE_H = 130; // dedicated band at top for event labels above axis
+const EVT_ZONE_H = 160; // dedicated band at top for event labels above axis
 const AXIS_H    = EVT_ZONE_H; // axis line sits at bottom of event zone
 
 const C_MASOOM    = "#E8B84B";
@@ -521,6 +521,63 @@ const EVENTS = [
     detail:"Mukhtar al-Thaqafi rose in Kufa avenging Karbala. He executed Ubaydullah ibn Ziyad, Shimr, and others responsible." },
   { id:"sughra",  ah:260, label:"Minor Occultation",    hdate:"260 AH",                ce:"874 CE", color:"#9B7BC4", pri:2, side:"above", arabic:"الغيبة الصغرى",
     detail:"Upon Imam al-Askari's (AS) martyrdom, the 12th Imam entered the Minor Occultation, communicating through four deputies over ~69 years." },
+  // ── PRE-HIJRA ──
+  { id:"isramiraj",  ah:-2,   label:"Isra wal Miraj ★",       hdate:"27 Rajab, 11 BH",        ce:"620 CE", color:"#F7E070", pri:3, side:"above", arabic:"الإسراء والمعراج",
+    detail:"The miraculous night journey of the Prophet ﷺ from Mecca to Jerusalem, then ascent through the heavens. He met the previous Prophets and received the commandment of Salah." },
+  { id:"layla_mabit", ah:1,   label:"Laylat al-Mabit",         hdate:"1 AH",                   ce:"622 CE", color:"#5EC48A", pri:2, side:"above", arabic:"ليلة المبيت",
+    detail:"On the eve of the Hijra, Imam Ali (AS) slept in the Prophet's ﷺ bed to deceive the assassins gathered outside, offering his life to protect the Prophet. Verse 2:207 was revealed about this act of sacrifice." },
+  // ── MADINAN ──
+  { id:"khandaq",    ah:5,    label:"Khandaq",                 hdate:"Shawwal, 5 AH",          ce:"627 CE", color:"#E07B54", pri:2, side:"above", arabic:"غزوة الخندق",
+    detail:"Battle of the Trench. Imam Ali (AS) killed Amr ibn Abd Wudd in single combat — the Prophet ﷺ declared it equal to all the worship of both worlds." },
+  { id:"hudaybiyya", ah:6,    label:"Treaty of Hudaybiyyah",   hdate:"Dhul Qa'da, 6 AH",       ce:"628 CE", color:"#9B84B0", pri:2, side:"above", arabic:"صلح الحديبية",
+    detail:"A 10-year truce with Quraysh, seen initially as a setback. Described by the Quran as a 'manifest victory' (48:1). It enabled the spread of Islam across Arabia." },
+  { id:"khaybar",    ah:7,    label:"Khaybar",                 hdate:"Muharram, 7 AH",         ce:"628 CE", color:"#E07B54", pri:2, side:"above", arabic:"غزوة خيبر",
+    detail:"Imam Ali (AS) conquered the fortress of Khaybar after others had failed. The Prophet ﷺ declared: 'I will give the flag to one who loves Allah and His Prophet.' A poisoned lamb was served here — the effects of which led to the Prophet's ﷺ eventual martyrdom." },
+  { id:"hajj_wada",  ah:10,   label:"Hajjat al-Wada",          hdate:"Dhul Hijja, 10 AH",      ce:"632 CE", color:"#F7D060", pri:2, side:"above", arabic:"حجة الوداع",
+    detail:"The Prophet's ﷺ farewell pilgrimage. On the return, at Ghadeer Khumm, he declared Imam Ali's (AS) succession before 120,000+ companions." },
+  // ── POST-PROPHET ──
+  { id:"saqifa",     ah:11,   label:"Saqifa",                  hdate:"11 AH",                  ce:"632 CE", color:"#C0392B", pri:2, side:"above", arabic:"سقيفة بني ساعدة",
+    detail:"While Imam Ali (AS) prepared the Prophet's ﷺ burial, a gathering at Saqifa Bani Sa'ida installed Abu Bakr as caliph. Imam Ali (AS) and the Ahl al-Bayt were not consulted. This event is regarded by Shia Muslims as a usurpation of the divinely ordained succession." },
+  { id:"fadak",      ah:11,   label:"Fadak",                   hdate:"11 AH",                  ce:"632 CE", color:"#C0392B", pri:2, side:"above", arabic:"فدك",
+    detail:"Sayyida Fatimah Zahra (AS) delivered her famous Fadakiyya sermon demanding the return of Fadak — the garden gifted to her by the Prophet ﷺ. Her claim and her testimony as daughter of the Prophet ﷺ were rejected. She passed away 75 days after the Prophet ﷺ, grief-stricken." },
+  { id:"shura",      ah:23,   label:"Shura — Uthman",          hdate:"23 AH",                  ce:"644 CE", color:"#9B84B0", pri:1, side:"above", arabic:"مجلس الشورى",
+    detail:"After Umar's death, a 6-member council (shura) selected Uthman as caliph over Imam Ali (AS). Imam Ali (AS) accepted to preserve Muslim unity." },
+  { id:"uthman_kill",ah:35,   label:"Assassination of Uthman", hdate:"35 AH",                  ce:"656 CE", color:"#E07B54", pri:1, side:"above", arabic:"مقتل عثمان",
+    detail:"Uthman was killed by discontented Muslims. Imam Ali (AS) was finally accepted as caliph — but immediately faced opposition from Muawiyah and others." },
+  { id:"nahrawan",   ah:38,   label:"Nahrawan",                hdate:"38 AH",                  ce:"658 CE", color:"#E07B54", pri:1, side:"above", arabic:"معركة النهروان",
+    detail:"Imam Ali (AS) fought the Khawarij — the first sectarian extremist group in Islam — who had defected after Siffin. The battle ended in their near-total defeat." },
+  { id:"hasan_treaty",ah:41,  label:"Treaty of Imam Hasan (AS)",hdate:"41 AH",                 ce:"661 CE", color:"#9B84B0", pri:2, side:"above", arabic:"صلح الإمام الحسن",
+    detail:"Under threat of war and betrayal by his own commanders, Imam Hasan (AS) negotiated a conditional treaty with Muawiyah to preserve Muslim lives and the Imamate. Conditions were later violated by Muawiyah." },
+  { id:"hujr",       ah:51,   label:"Martyrdom of Hujr ibn Adi",hdate:"51 AH",                ce:"671 CE", color:"#E07B54", pri:1, side:"above", arabic:"شهادة حجر بن عدي",
+    detail:"Hujr ibn Adi (RA) and his companions were executed by Muawiyah for refusing to curse Imam Ali (AS) in public prayers — among the first state-sponsored Shia martyrdoms after Karbala's causes began forming." },
+  { id:"yazid_appt", ah:60,   label:"Yazid Demands Bay'ah",    hdate:"60 AH",                  ce:"680 CE", color:"#C0392B", pri:2, side:"above", arabic:"مطالبة يزيد بالبيعة",
+    detail:"On Muawiyah's death, Yazid demanded allegiance. Imam Husayn (AS) refused, declaring: 'One like me does not give allegiance to one like him.' He departed from Medina toward Karbala." },
+  { id:"captives",   ah:62,   label:"Return of Karbala Captives",hdate:"62 AH",                ce:"681 CE", color:"#9B84B0", pri:1, side:"above", arabic:"عودة السبايا",
+    detail:"Imam Sajjad (AS) and Sayyida Zaynab (SA) returned to Medina after their ordeal in Kufa and Damascus, where Imam Sajjad's (AS) sermon and Zaynab's (SA) speeches had already exposed Yazid's crimes to the Muslim world." },
+  { id:"harrah",     ah:63,   label:"Massacre of Harrah",       hdate:"63 AH",                 ce:"683 CE", color:"#E07B54", pri:1, side:"above", arabic:"وقعة الحرة",
+    detail:"Yazid's army under Muslim ibn Uqba massacred the people of Medina. The city was given over to plunder for three days. A dark chapter in early Islamic history." },
+  { id:"tawwabeen",  ah:65,   label:"Tawwabeen Uprising",       hdate:"65 AH",                 ce:"684 CE", color:"#7EB8C9", pri:2, side:"above", arabic:"ثورة التوابين",
+    detail:"The Penitents — Kufans who felt guilt for abandoning Imam Husayn (AS) — rose under Sulayman ibn Surad to avenge Karbala. Most were martyred at Ain al-Warda against the Umayyad forces." },
+  // ── LATER UMAYYAD ──
+  { id:"zayd_uprising",ah:122, label:"Uprising of Zayd ibn Ali", hdate:"122 AH",               ce:"740 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة زيد بن علي",
+    detail:"Zayd ibn Ali, son of Imam Sajjad (AS), rose against the Umayyad caliph Hisham in Kufa. He was martyred, his body crucified. His uprising inspired future Alid revolts." },
+  { id:"yahya_zayd", ah:125,  label:"Uprising of Yahya ibn Zayd",hdate:"125 AH",               ce:"743 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة يحيى بن زيد",
+    detail:"Yahya ibn Zayd continued his father's revolt in Khorasan and was martyred. His death further galvanised anti-Umayyad sentiment, contributing to the Abbasid revolution." },
+  { id:"abbasid",    ah:132,  label:"Fall of Umayyads",         hdate:"132 AH",                ce:"750 CE", color:"#9B84B0", pri:2, side:"above", arabic:"سقوط الدولة الأموية",
+    detail:"The Abbasid Revolution ended Umayyad rule. Initially welcomed by Shia Muslims, the Abbasids soon proved equally hostile to the Imams — most of whom they imprisoned or poisoned." },
+  { id:"nafs_zakiyya",ah:145, label:"Nafs al-Zakiyya Revolt",   hdate:"145 AH",                ce:"762 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة النفس الزكية",
+    detail:"Muhammad ibn Abd Allah al-Hasani (al-Nafs al-Zakiyya) rose against the Abbasids in Medina and was martyred. His revolt forced Imam Sadiq (AS) to navigate a delicate political position." },
+  // ── ABBASID PERIOD ──
+  { id:"kadhim_prison",ah:179,label:"Imam Kadhim (AS) Imprisoned",hdate:"179 AH",              ce:"795 CE", color:"#C0392B", pri:2, side:"above", arabic:"سجن الإمام الكاظم",
+    detail:"Harun al-Rashid had Imam Kadhim (AS) imprisoned in Baghdad after years of surveillance. The Imam spent his final years in various prisons, and was martyred by poisoning in 183 AH." },
+  { id:"ridha_wali",  ah:201, label:"Imam Ridha (AS) — Crown Prince",hdate:"201 AH",           ce:"817 CE", color:"#9B84B0", pri:2, side:"above", arabic:"ولاية العهد",
+    detail:"Caliph Ma'mun appointed Imam Ridha (AS) as his crown prince — seen by historians as an attempt to neutralise Alid opposition. The Imam accepted under duress. He was martyred by poisoning two years later." },
+  { id:"masuma_qum",  ah:201, label:"Sayyida Masuma (SA) in Qum", hdate:"201 AH",              ce:"816 CE", color:"#5EC48A", pri:2, side:"above", arabic:"قدوم السيدة فاطمة المعصومة",
+    detail:"Sayyida Fatimah al-Masuma (SA), sister of Imam Ridha (AS), journeyed from Medina to join her brother in Khorasan. She fell ill and passed away in Qum — which became one of the holiest Shia cities." },
+  { id:"mutawakkil",  ah:237, label:"Mutawakkil's Persecution",   hdate:"237 AH",              ce:"851 CE", color:"#C0392B", pri:2, side:"above", arabic:"اضطهاد المتوكل",
+    detail:"Abbasid caliph Mutawakkil ordered the demolition of Imam Husayn's (AS) shrine in Karbala and forbade pilgrimages to the site. He intensified persecution of Shia Muslims and placed Imam Hadi (AS) under house arrest." },
+  { id:"samarra",     ah:243, label:"Imam Hadi (AS) to Samarra",  hdate:"243 AH",              ce:"857 CE", color:"#C0392B", pri:1, side:"above", arabic:"نقل الإمام الهادي إلى سامراء",
+    detail:"Mutawakkil summoned Imam Hadi (AS) from Medina to Samarra to keep him under close surveillance. The Imam spent the rest of his life under virtual house arrest there. Imam Askari (AS) was also confined in Samarra." },
   { id:"kubra",   ah:329, label:"MAJOR OCCULTATION ★",  hdate:"329 AH",                ce:"941 CE", color:"#7B5BC4", pri:3, side:"above", arabic:"الغيبة الكبرى",
     detail:"Ali ibn Muhammad al-Samarri's death marked the beginning of the Major Occultation. The Imam is hidden until the Zuhur." },
 ];
@@ -577,26 +634,37 @@ export default function ShiaTimeline() {
   // ── Build dynamic row list ──
   const rows = useMemo(()=>{
     const list=[];
-    const compMode   = filter==="companions"; // auto-expand all companions
+    const compMode = filter==="companions";
     const showMasoom = filter==="all"||filter==="masoomeen"||compMode;
     const showFamily = filter==="all"||filter==="family";
+    const showComp   = filter==="all"||compMode;
 
+    // Build master list: merge Masoomeen + Family, sort by birthAH
+    const allPrimary = [];
     if(showMasoom){
       for(const m of MASOOMEEN){
-        list.push({ type:"masoom", data:m, color:C_MASOOM, h:ROW_H });
-        const showSubs = m.ashaab && m.ashaab.length>0 && (compMode || ((filter==="all") && expanded.has(m.id)));
+        allPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:ROW_H });
+      }
+    }
+    if(showFamily){
+      for(const f of FAMILY){
+        allPrimary.push({ type:"family", data:f, color:C_FAMILY, h:ROW_H });
+      }
+    }
+    // Sort chronologically by birthAH
+    allPrimary.sort((a,b)=> a.data.birthAH - b.data.birthAH);
+
+    // Insert companion sub-rows immediately after their parent Imam
+    for(const row of allPrimary){
+      list.push(row);
+      if(row.type==="masoom" && showComp){
+        const m = row.data;
+        const showSubs = m.ashaab && m.ashaab.length>0 && (compMode || expanded.has(m.id));
         if(showSubs){
           for(const a of m.ashaab){
             list.push({ type:"companion", data:a, color:C_COMPANION, h:SUB_ROW_H, parentId:m.id });
           }
         }
-      }
-    }
-    if(showFamily){
-      // separator
-      if(showMasoom) list.push({ type:"sep", h:8 });
-      for(const f of FAMILY){
-        list.push({ type:"family", data:f, color:C_FAMILY, h:ROW_H });
       }
     }
     return list;
@@ -625,7 +693,7 @@ export default function ShiaTimeline() {
     const mapped = EVENTS.map(ev => {
       const visible = ev.pri===3 || (ev.pri===2 && zoom>=1.5) || zoom>=2.8;
       const slot = ev.side==="above" ? evAbove++ : evBelow++;
-      const lv = 8 + (slot%4)*28;
+      const lv = 6 + (slot%4)*30;
       const labelY = ev.side==="above" ? lv : baseBelow+lv;
       return { ...ev, labelY, _vis: visible };
     });
@@ -763,11 +831,12 @@ export default function ShiaTimeline() {
               <div style={{ position:"absolute",top:AXIS_H-1,left:0,right:0,height:1,background:"rgba(184,146,74,0.35)" }}/>
               {ticks.map(y=>{
                 const x=xOf(y),isMajor=y%100===0||y===1,isMid=y%50===0&&!isMajor;
+                const tickH=isMajor?14:isMid?9:5;
                 return (
-                  <div key={y} style={{ position:"absolute",left:x,top:AXIS_H-1 }}>
-                    <div style={{ position:"absolute",top:0,left:0,width:1,height:isMajor?14:isMid?9:5,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
+                  <div key={y} style={{ position:"absolute",left:x,top:AXIS_H-tickH }}>
+                    <div style={{ position:"absolute",top:0,left:0,width:1,height:tickH,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
                     {(isMajor||isMid||zoom>2)&&(
-                      <div style={{ position:"absolute",top:16,left:y===1?-24:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
+                      <div style={{ position:"absolute",bottom:tickH+3,left:y===1?-24:y<0?-14:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
                         {y===1?"1 AH · Hijra ✦":ahLabel(y)}
                       </div>
                     )}
@@ -904,7 +973,7 @@ export default function ShiaTimeline() {
 
       {/* Stats */}
       <div style={{ display:"flex",justifyContent:"center",gap:18,padding:"4px 16px 12px",flexWrap:"wrap" }}>
-        {[["14","Masoomeen (AS)"],["12","Family Personalities"],["52","Companions & Deputies"],["14","Major Events"]].map(([n,l])=>(
+        {[["14","Masoomeen (AS)"],["12","Ahl al-Bayt & Family"],["52","Companions & Deputies"],["40","Major Events"]].map(([n,l])=>(
           <div key={l} style={{ textAlign:"center" }}>
             <div style={{ fontSize:15,color:"#F5C842" }}>{n}</div>
             <div style={{ fontSize:8,color:"#6A7C8A",textTransform:"uppercase",letterSpacing:"0.07em" }}>{l}</div>

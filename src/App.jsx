@@ -11,7 +11,6 @@ const BAR_GAP  = 4;
 const SUB_H    = 12;   // companion sub-row bar height
 const ROW_H    = BAR_H + BAR_GAP;
 const SUB_ROW_H = SUB_H + 3;
-const SIDEBAR_W = 210;
 const EVT_ZONE_H = 130; // dedicated band at top for event labels above axis
 const AXIS_H    = EVT_ZONE_H; // axis line sits at bottom of event zone
 
@@ -694,7 +693,7 @@ export default function ShiaTimeline() {
           ["#E63946","◆","Martyrdom"],
           ["#D4A843","◆","Wafat"],
           ["#9B7BC4","◉","Occultation"],
-          ["#aaa","▶","Click to expand companions"],
+          ["#aaa","▶","Tap bar to expand companions"],
         ].map(([c,sym,lbl])=>(
           <span key={lbl} style={{ display:"flex",alignItems:"center",gap:4,fontSize:9.5,color:"#6A7C8A" }}>
             <span style={{ color:c,fontSize:11 }}>{sym}</span>{lbl}
@@ -703,53 +702,10 @@ export default function ShiaTimeline() {
       </div>
 
       {/* Main layout: sidebar + canvas */}
-      <div style={{ display:"flex", flex:"0 0 auto", padding:"0 12px 8px", gap:0 }}>
-
-        {/* ── SIDEBAR ── */}
-        <div style={{ width:SIDEBAR_W, flexShrink:0, paddingTop:AXIS_H+6, overflowY:"auto", WebkitOverflowScrolling:"touch", borderRight:"1px solid rgba(184,146,74,0.12)" }}>
-          {rows.map((row, i)=>{
-            if(row.type==="sep") return <div key={`sep-${i}`} style={{ height:row.h, boxSizing:"border-box", borderTop:"1px solid rgba(255,255,255,0.06)", margin:"0" }}/>;
-            const d=row.data;
-            const isCompanion=row.type==="companion";
-            const hasSubs = row.type==="masoom" && d.ashaab && d.ashaab.length>0 && filter==="all";
-            const isExp = expanded.has(d.id);
-            return (
-              <div key={d.id} style={{
-                height:row.h, boxSizing:"border-box", display:"flex", alignItems:"center",
-                paddingLeft:isCompanion?16:4, paddingRight:4,
-                borderBottom:`1px solid rgba(255,255,255,0.03)`,
-                background:i%2===0?"rgba(255,255,255,0.01)":"transparent",
-                cursor:"pointer", WebkitTapHighlightColor:"transparent",
-              }}
-                onClick={()=>setSel({...d,_type:"person",group:row.type,color:row.color})}
-                onMouseEnter={e=>e.currentTarget.style.background="rgba(184,146,74,0.06)"}
-                onMouseLeave={e=>e.currentTarget.style.background=i%2===0?"rgba(255,255,255,0.01)":"transparent"}
-              >
-                {/* Expand toggle */}
-                {hasSubs && (
-                  <span
-                    onClick={e=>{ e.stopPropagation(); toggleExpand(d.id); }}
-                    style={{ fontSize:8, color:"#C9A96E", marginRight:4, cursor:"pointer", opacity:0.8, flexShrink:0, userSelect:"none", WebkitTapHighlightColor:"transparent", textDecoration:"none" }}
-                  >{isExp?"▼":"▶"}</span>
-                )}
-                {!hasSubs && !isCompanion && <span style={{ width:12, flexShrink:0 }}/>}
-                {isCompanion && <span style={{ width:8, height:8, borderRadius:"50%", background:`${row.color}66`, border:`1px solid ${row.color}88`, flexShrink:0, marginRight:4 }}/>}
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize: isCompanion?8:9, color:row.color, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", lineHeight:1.3 }}>
-                    {d.imamNo?`I${d.imamNo}· `:""}{d.short}
-                  </div>
-                  {!isCompanion && zoom>1 && (
-                    <div style={{ fontSize:7, color:"rgba(255,255,255,0.22)", direction:"rtl", textAlign:"right", marginTop:1, overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis" }}>
-                      {d.arabic?.slice(0,18)}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <div style={{ display:"flex", flex:"0 0 auto", padding:"0 12px 8px" }}>
 
         {/* ── SCROLLABLE CANVAS ── */}
+
         <div ref={vpRef} style={{ flex:1, minWidth:0 }}>
           <div
             onWheel={onWheel}
@@ -859,9 +815,17 @@ export default function ShiaTimeline() {
                       onMouseLeave={e=>{ e.currentTarget.style.filter="brightness(1)";e.currentTarget.style.zIndex="3"; }}
                     >
                       {barW>14&&(
-                        <div style={{ position:"absolute",left:stickyLeft,top:0,bottom:0,display:"flex",alignItems:"center",
-                          fontSize:isComp?7:zoom>2?9:8,color:`${row.color}cc`,whiteSpace:"nowrap",pointerEvents:"none",letterSpacing:"0.02em",transition:"left 0.04s linear"
+                        <div style={{ position:"absolute",left:stickyLeft,top:0,bottom:0,display:"flex",alignItems:"center",gap:3,
+                          fontSize:isComp?7:zoom>2?9:8,color:`${row.color}cc`,whiteSpace:"nowrap",letterSpacing:"0.02em",transition:"left 0.04s linear"
                         }}>
+                          {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
+                            <span onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
+                              style={{fontSize:7,color:`${row.color}ee`,cursor:"pointer",
+                                pointerEvents:"all",userSelect:"none",
+                                WebkitTapHighlightColor:"transparent",paddingRight:2}}>
+                              {expanded.has(d.id)?"▼":"▶"}
+                            </span>
+                          )}
                           {zoom>1.1&&barW>50
                             ? <>{d.imamNo?`I${d.imamNo}·`:""}{d.short}</>
                             : <>{d.imamNo?`I${d.imamNo}`:d.id==="prophet"?"ﷺ":d.short?.slice(0,6)}</>

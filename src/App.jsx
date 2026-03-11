@@ -646,7 +646,7 @@ export default function ShiaTimeline() {
   const showEvents = filter==="all"||filter==="events";
 
   return (
-    <div style={{ minHeight:"100vh", background:"radial-gradient(ellipse at 20% 10%,#0D1228 0%,#060810 65%)", fontFamily:"'Palatino Linotype','Book Antiqua',Georgia,serif", color:"#D8CCBA", display:"flex", flexDirection:"column", overflowX:"hidden" }}>
+    <div style={{ minHeight:"100vh", background:"radial-gradient(ellipse at 20% 10%,#0D1228 0%,#060810 65%)", fontFamily:"'Palatino Linotype','Book Antiqua',Georgia,serif", color:"#D8CCBA", display:"flex", flexDirection:"column", overflowX:"hidden", overflowY:"auto", WebkitOverflowScrolling:"touch" }}>
 
       {/* Header */}
       <div style={{ textAlign:"center", padding:"16px 16px 6px" }}>
@@ -673,7 +673,7 @@ export default function ShiaTimeline() {
             border:`1px solid ${filter===k?c:"rgba(255,255,255,0.1)"}`,
             color:filter===k?"#06080F":c, padding:"3px 11px", borderRadius:20,
             fontSize:10, cursor:"pointer", fontWeight:filter===k?700:400,
-            letterSpacing:"0.04em", transition:"all 0.2s"
+            letterSpacing:"0.04em", transition:"all 0.2s", WebkitTapHighlightColor:"transparent"
           }}>{lbl}</button>
         ))}
         <div style={{ display:"flex", gap:4, marginLeft:4 }}>
@@ -703,7 +703,7 @@ export default function ShiaTimeline() {
       </div>
 
       {/* Main layout: sidebar + canvas */}
-      <div style={{ display:"flex", flex:1, padding:"0 12px 8px", gap:0, minHeight:0 }}>
+      <div style={{ display:"flex", flex:"0 0 auto", padding:"0 12px 8px", gap:0 }}>
 
         {/* ── SIDEBAR ── */}
         <div style={{ width:SIDEBAR_W, flexShrink:0, paddingTop:AXIS_H+6, overflowY:"auto", WebkitOverflowScrolling:"touch", borderRight:"1px solid rgba(184,146,74,0.12)" }}>
@@ -719,7 +719,7 @@ export default function ShiaTimeline() {
                 paddingLeft:isCompanion?16:4, paddingRight:4,
                 borderBottom:`1px solid rgba(255,255,255,0.03)`,
                 background:i%2===0?"rgba(255,255,255,0.01)":"transparent",
-                cursor:"pointer",
+                cursor:"pointer", WebkitTapHighlightColor:"transparent",
               }}
                 onClick={()=>setSel({...d,_type:"person",group:row.type,color:row.color})}
                 onMouseEnter={e=>e.currentTarget.style.background="rgba(184,146,74,0.06)"}
@@ -729,7 +729,7 @@ export default function ShiaTimeline() {
                 {hasSubs && (
                   <span
                     onClick={e=>{ e.stopPropagation(); toggleExpand(d.id); }}
-                    style={{ fontSize:8, color:"#C9A96E", marginRight:4, cursor:"pointer", opacity:0.8, flexShrink:0, userSelect:"none" }}
+                    style={{ fontSize:8, color:"#C9A96E", marginRight:4, cursor:"pointer", opacity:0.8, flexShrink:0, userSelect:"none", WebkitTapHighlightColor:"transparent", textDecoration:"none" }}
                   >{isExp?"▼":"▶"}</span>
                 )}
                 {!hasSubs && !isCompanion && <span style={{ width:12, flexShrink:0 }}/>}

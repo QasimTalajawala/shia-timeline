@@ -6,11 +6,14 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 const MIN_AH   = -135;
 const MAX_AH   = 365; // extra right padding so last bars aren't at edge
 const SPAN     = MAX_AH - MIN_AH;
-const BAR_H    = 15;
-const BAR_GAP  = 4;
-const SUB_H    = 12;   // companion sub-row bar height
-const ROW_H    = BAR_H + BAR_GAP;
-const SUB_ROW_H = SUB_H + 3;
+const BAR_H      = 15;
+const BAR_GAP    = 6;   // gap below bar (before button or next row)
+const BTN_H      = 14;  // expand/collapse button height
+const BTN_GAP    = 6;   // gap after button to next row
+const SUB_H      = 12;  // companion sub-row bar height
+const ROW_H      = BAR_H + BAR_GAP;                    // family / no-ashaab rows
+const MASOOM_ROW_H = BAR_H + BAR_GAP + BTN_H + BTN_GAP; // masoom rows with button
+const SUB_ROW_H  = SUB_H + 6;
 const EVT_ZONE_H = 160; // dedicated band at top for event labels above axis
 const AXIS_H    = EVT_ZONE_H; // axis line sits at bottom of event zone
 
@@ -662,7 +665,7 @@ export default function ShiaTimeline() {
     const allPrimary = [];
     if(showMasoom){
       for(const m of MASOOMEEN){
-        allPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:ROW_H });
+        allPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:(m.ashaab&&m.ashaab.length>0&&(filter==="all"||filter==="companions")?MASOOM_ROW_H:ROW_H) });
       }
     }
     if(showFamily){
@@ -949,23 +952,28 @@ export default function ShiaTimeline() {
                         display:"flex",alignItems:"center",justifyContent:"center",fontSize:7,color:"#9B7BC4"
                       }}>◉</div>
                     )}
-                    {/* Companion hint strip — tap to expand */}
-                    {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&!expanded.has(d.id)&&(
+                    {/* Companion expand/collapse button */}
+                    {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
                       <div
                         onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
                         style={{
-                          position:"absolute",left:bx,top:top+bh,
-                          width:Math.min(barW,100),height:8,
-                          display:"flex",alignItems:"center",justifyContent:"center",
-                          background:`${row.color}14`,
-                          borderRadius:"0 0 4px 4px",
-                          border:`1px solid ${row.color}28`,borderTop:"none",
-                          cursor:"pointer",WebkitTapHighlightColor:"transparent",
-                          userSelect:"none",zIndex:4,
+                          position:"absolute",
+                          left:bx, top:top+BAR_H+BAR_GAP,
+                          width:Math.min(barW,130), height:BTN_H,
+                          display:"flex", alignItems:"center", justifyContent:"center", gap:4,
+                          background:expanded.has(d.id)?`${row.color}28`:`${row.color}18`,
+                          borderRadius:"0 0 6px 6px",
+                          border:`1px solid ${row.color}${expanded.has(d.id)?"55":"35"}`,
+                          borderTop:"none",
+                          cursor:"pointer", WebkitTapHighlightColor:"transparent",
+                          userSelect:"none", zIndex:4,
+                          transition:"background 0.2s",
                         }}
                       >
-                        <span style={{fontSize:6,color:`${row.color}88`,letterSpacing:"0.04em"}}>
-                          {d.ashaab.length} ▾
+                        <span style={{fontSize:7, color:`${row.color}${expanded.has(d.id)?"cc":"88"}`, letterSpacing:"0.05em", fontFamily:"sans-serif"}}>
+                          {expanded.has(d.id)
+                            ? `▲ hide companions`
+                            : `▼ ${d.ashaab.length} companions`}
                         </span>
                       </div>
                     )}

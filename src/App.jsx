@@ -757,19 +757,17 @@ export default function ShiaTimeline() {
             onMouseMove={e=>{ if(drag.current.active) setOffset(clamp(drag.current.off0+drag.current.x0-e.clientX)); }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
-            onTouchStart={e=>{ const t=e.touches[0]; drag.current={active:true,x0:t.clientX,off0:offset}; }}
-            onTouchMove={e=>{ e.preventDefault();
+            onTouchStart={e=>{ const t=e.touches[0]; drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null}; }}
+            onTouchMove={e=>{
+              // pinch: always handle and block
               if(e.touches.length===2){
+                e.preventDefault();
                 const dx=e.touches[0].clientX-e.touches[1].clientX;
                 const dy=e.touches[0].clientY-e.touches[1].clientY;
                 const d=Math.sqrt(dx*dx+dy*dy);
                 const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
                 const pivot=midX-e.currentTarget.getBoundingClientRect().left;
-                if(!pinch.current.active){
-                  pinch.current={active:true,d0:d,z0:zoom,lastD:d};
-                  return;
-                }
-                // use lastD for incremental zoom so it stays responsive throughout gesture
+                if(!pinch.current.active){ pinch.current={active:true,d0:d,z0:zoom,lastD:d}; return; }
                 const delta=d/pinch.current.lastD;
                 pinch.current.lastD=d;
                 const curZoom=pinch.current.z0*(d/pinch.current.d0);
@@ -777,14 +775,26 @@ export default function ShiaTimeline() {
                 const nMaxOff=Math.max(0,vpW*nz-vpW);
                 setZoom(nz);
                 setOffset(o=>Math.max(0,Math.min(nMaxOff,(o+pivot)*delta-pivot)));
-              } else if(drag.current.active){
-                const t=e.touches[0];
-                pinch.current.active=false;
-                setOffset(clamp(drag.current.off0+drag.current.x0-t.clientX));
+                return;
               }
+              if(!drag.current.active) return;
+              const t=e.touches[0];
+              const dx=t.clientX-drag.current.x0;
+              const dy=t.clientY-drag.current.y0;
+              // lock direction on first significant move
+              if(!drag.current.dir){
+                if(Math.abs(dx)<4 && Math.abs(dy)<4) return; // too small to judge
+                drag.current.dir = Math.abs(dx)>Math.abs(dy) ? "h" : "v";
+              }
+              if(drag.current.dir==="h"){
+                e.preventDefault(); // block page scroll only for horizontal drag
+                pinch.current.active=false;
+                setOffset(clamp(drag.current.off0-dx));
+              }
+              // vertical: do nothing — let browser handle page scroll naturally
             }}
             onTouchEnd={()=>{ drag.current.active=false; pinch.current.active=false; }}
-            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"none", height:canvasH }}
+            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
           >
             <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>
 

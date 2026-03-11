@@ -763,19 +763,27 @@ export default function ShiaTimeline() {
                 const dx=e.touches[0].clientX-e.touches[1].clientX;
                 const dy=e.touches[0].clientY-e.touches[1].clientY;
                 const d=Math.sqrt(dx*dx+dy*dy);
-                if(!pinch.current.active){ pinch.current={active:true,d0:d,z0:zoom}; return; }
-                const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
                 const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-                const rect=e.currentTarget.getBoundingClientRect();
-                const pivot=midX-rect.left;
-                setZoom(()=>{ setOffset(o=>clamp((o+pivot)*(nz/pinch.current.z0)-pivot)); return nz; });
+                const pivot=midX-e.currentTarget.getBoundingClientRect().left;
+                if(!pinch.current.active){
+                  pinch.current={active:true,d0:d,z0:zoom,lastD:d};
+                  return;
+                }
+                // use lastD for incremental zoom so it stays responsive throughout gesture
+                const delta=d/pinch.current.lastD;
+                pinch.current.lastD=d;
+                const curZoom=pinch.current.z0*(d/pinch.current.d0);
+                const nz=Math.max(1,Math.min(14,curZoom));
+                const nMaxOff=Math.max(0,vpW*nz-vpW);
+                setZoom(nz);
+                setOffset(o=>Math.max(0,Math.min(nMaxOff,(o+pivot)*delta-pivot)));
               } else if(drag.current.active){
                 const t=e.touches[0];
                 pinch.current.active=false;
                 setOffset(clamp(drag.current.off0+drag.current.x0-t.clientX));
               }
             }}
-            onTouchEnd={()=>{ drag.current.active=false; }}
+            onTouchEnd={()=>{ drag.current.active=false; pinch.current.active=false; }}
             style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"none", height:canvasH }}
           >
             <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>

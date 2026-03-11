@@ -586,7 +586,8 @@ const EVENTS = [
 //  MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────
 export default function ShiaTimeline() {
-  const vpRef = useRef(null);
+  const vpRef    = useRef(null);
+  const scrollRef = useRef(null);
   const [vpW, setVpW]         = useState(900);
   const [zoom, setZoom]       = useState(1);
   const [offset, setOffset]   = useState(0);
@@ -595,8 +596,6 @@ export default function ShiaTimeline() {
   const [filter, setFilter]   = useState("all");
   const drag  = useRef({ active:false, x0:0, off0:0 });
   const pinch    = useRef({ active:false, d0:0, z0:1 });
-  const momentum  = useRef({ vx:0, lastX:0, lastT:0, raf:null });
-  const maxOffRef  = useRef(0);
 
   useEffect(()=>{
     const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
@@ -604,26 +603,43 @@ export default function ShiaTimeline() {
     return ()=>window.removeEventListener("resize",m);
   },[]);
 
+  // Attach wheel listener non-passively so preventDefault works
+  useEffect(()=>{
+    const el = scrollRef.current;
+    if(!el) return;
+    const handler = (e) => {
+      if(e.ctrlKey||e.metaKey){
+        e.preventDefault();
+        doZoom(e.deltaY<0?"in":"out", e.clientX-el.getBoundingClientRect().left);
+      } else {
+        // let native scroll handle it
+      }
+    };
+    el.addEventListener("wheel", handler, { passive:false });
+    return ()=>el.removeEventListener("wheel", handler);
+  },[zoom]);
+
   const tlW    = vpW * zoom;
-  const maxOff = Math.max(0, tlW - vpW);
-  maxOffRef.current = maxOff;
-  const clamp  = useCallback(v=>Math.max(0,Math.min(v,maxOff)),[maxOff]);
   const xOf    = useCallback(ah=>((ah-MIN_AH)/SPAN)*tlW,[tlW]);
 
-  useEffect(()=>{ setOffset(o=>clamp(o)); },[zoom,clamp]);
-
-  function doZoom(dir, pivot){
+  function doZoom(dir, pivot, nzOverride){
     const p=pivot??vpW/2;
     setZoom(z=>{
-      const nz=dir==="in"?Math.min(z*1.6,14):Math.max(z/1.6,1);
-      setOffset(o=>clamp((o+p)*(nz/z)-p));
+      const nz=nzOverride??( dir==="in"?Math.min(z*1.6,14):Math.max(z/1.6,1) );
+      // adjust native scroll position to keep pivot in place
+      requestAnimationFrame(()=>{
+        if(scrollRef.current){
+          const curScroll = scrollRef.current.scrollLeft;
+          scrollRef.current.scrollLeft = (curScroll+p)*(nz/z)-p;
+        }
+      });
       return nz;
     });
   }
   function onWheel(e){
     e.preventDefault();
     if(e.ctrlKey||e.metaKey) doZoom(e.deltaY<0?"in":"out",e.clientX-e.currentTarget.getBoundingClientRect().left);
-    else setOffset(o=>clamp(o+e.deltaX+e.deltaY*0.5));
+    else if(scrollRef.current) scrollRef.current.scrollBy({ left: e.deltaX+e.deltaY*0.5 });
   }
 
   function toggleExpand(id){
@@ -779,16 +795,18 @@ export default function ShiaTimeline() {
 
         <div ref={vpRef} style={{ flex:1, minWidth:0 }}>
           <div
-            onWheel={onWheel}
-            onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,off0:offset}; }}
-            onMouseMove={e=>{ if(drag.current.active) setOffset(clamp(drag.current.off0+drag.current.x0-e.clientX)); }}
+            ref={scrollRef}
+            onScroll={e=>setOffset(e.target.scrollLeft)}
+            onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,scrollX:scrollRef.current?.scrollLeft||0}; }}
+            onMouseMove={e=>{ if(drag.current.active && scrollRef.current) scrollRef.current.scrollLeft=drag.current.scrollX+drag.current.x0-e.clientX; }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
             onTouchStart={e=>{
-              if(momentum.current.raf){ cancelAnimationFrame(momentum.current.raf); momentum.current.raf=null; }
-              const t=e.touches[0];
-              drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null};
-              momentum.current={vx:0,lastX:t.clientX,lastT:Date.now(),raf:null};
+              if(e.touches.length===1){
+                const t=e.touches[0];
+                drag.current={active:true,x0:t.clientX,y0:t.clientY,scrollX:scrollRef.current?.scrollLeft||0,dir:null};
+                pinch.current.active=false;
+              }
             }}
             onTouchMove={e=>{
               if(e.touches.length===2){
@@ -797,14 +815,11 @@ export default function ShiaTimeline() {
                 const dy=e.touches[0].clientY-e.touches[1].clientY;
                 const d=Math.sqrt(dx*dx+dy*dy);
                 const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-                const pivot=midX-e.currentTarget.getBoundingClientRect().left;
+                const pivot=midX-(scrollRef.current?.getBoundingClientRect().left||0);
                 if(!pinch.current.active){ pinch.current={active:true,d0:d,z0:zoom,lastD:d}; return; }
-                const delta=d/pinch.current.lastD;
                 pinch.current.lastD=d;
                 const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
-                const nMaxOff=Math.max(0,vpW*nz-vpW);
-                setZoom(nz);
-                setOffset(o=>Math.max(0,Math.min(nMaxOff,(o+pivot)*delta-pivot)));
+                doZoom(null,pivot,nz);
                 return;
               }
               if(!drag.current.active) return;
@@ -817,39 +832,15 @@ export default function ShiaTimeline() {
               }
               if(drag.current.dir==="h"){
                 e.preventDefault();
-                pinch.current.active=false;
-                // track velocity
-                const now=Date.now();
-                const dt=Math.max(1,now-momentum.current.lastT);
-                momentum.current.vx=(t.clientX-momentum.current.lastX)/dt;
-                momentum.current.lastX=t.clientX;
-                momentum.current.lastT=now;
-                setOffset(clamp(drag.current.off0-dx));
+                if(scrollRef.current) scrollRef.current.scrollLeft=drag.current.scrollX-dx;
               }
             }}
-            onTouchEnd={()=>{
-              pinch.current.active=false;
-              if(drag.current.dir==="h"){
-                // launch momentum scroll
-                let vx = momentum.current.vx * 1000; // px/s
-                const friction = 0.96;
-                const animate = () => {
-                  if(Math.abs(vx)<0.3){ momentum.current.raf=null; return; }
-                  vx *= friction;
-                  setOffset(o=>{
-                    const n=o-vx*0.016;
-                    return Math.max(0,Math.min(maxOffRef.current,n));
-                  });
-                  momentum.current.raf=requestAnimationFrame(animate);
-                };
-                momentum.current.raf=requestAnimationFrame(animate);
-              }
-              drag.current.active=false;
-              drag.current.dir=null;
-            }}
-            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
+            onTouchEnd={()=>{ drag.current.active=false; drag.current.dir=null; pinch.current.active=false; }}
+            style={{ overflowX:"auto", overflowY:"hidden", WebkitOverflowScrolling:"touch",
+              cursor:drag.current.active?"grabbing":"grab", userSelect:"none",
+              touchAction:"pan-x pan-y",ight:canvasH }}
           >
-            <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>
+            <div style={{ width:tlW, height:canvasH, position:"relative" }}>
 
               {/* Reference lines */}
               {[{ah:1,c:"rgba(126,184,201,0.08)"},{ah:61,c:"rgba(230,57,70,0.09)"},{ah:10,c:"rgba(245,197,24,0.06)"}].map(({ah,c})=>(
@@ -869,6 +860,7 @@ export default function ShiaTimeline() {
                         {y===1?"1 AH · Hijra ✦":ahLabel(y)}
                       </div>
                     )}
+
                   </div>
                 );
               })}
@@ -956,6 +948,26 @@ export default function ShiaTimeline() {
                         boxShadow:"0 0 10px #9B7BC480",cursor:"pointer",zIndex:6,
                         display:"flex",alignItems:"center",justifyContent:"center",fontSize:7,color:"#9B7BC4"
                       }}>◉</div>
+                    )}
+                    {/* Companion hint strip — tap to expand */}
+                    {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&!expanded.has(d.id)&&(
+                      <div
+                        onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
+                        style={{
+                          position:"absolute",left:bx,top:top+bh,
+                          width:Math.min(barW,100),height:8,
+                          display:"flex",alignItems:"center",justifyContent:"center",
+                          background:`${row.color}14`,
+                          borderRadius:"0 0 4px 4px",
+                          border:`1px solid ${row.color}28`,borderTop:"none",
+                          cursor:"pointer",WebkitTapHighlightColor:"transparent",
+                          userSelect:"none",zIndex:4,
+                        }}
+                      >
+                        <span style={{fontSize:6,color:`${row.color}88`,letterSpacing:"0.04em"}}>
+                          {d.ashaab.length} ▾
+                        </span>
+                      </div>
                     )}
                   </div>
                 );

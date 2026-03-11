@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 //  CONSTANTS
 // ─────────────────────────────────────────────────────────────
 const MIN_AH   = -135;
-const MAX_AH   = 345;
+const MAX_AH   = 365; // extra right padding so last bars aren't at edge
 const SPAN     = MAX_AH - MIN_AH;
 const BAR_H    = 15;
 const BAR_GAP  = 4;
@@ -595,7 +595,8 @@ export default function ShiaTimeline() {
   const [filter, setFilter]   = useState("all");
   const drag  = useRef({ active:false, x0:0, off0:0 });
   const pinch    = useRef({ active:false, d0:0, z0:1 });
-  const momentum = useRef({ vx:0, lastX:0, lastT:0, raf:null });
+  const momentum  = useRef({ vx:0, lastX:0, lastT:0, raf:null });
+  const maxOffRef  = useRef(0);
 
   useEffect(()=>{
     const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
@@ -605,6 +606,7 @@ export default function ShiaTimeline() {
 
   const tlW    = vpW * zoom;
   const maxOff = Math.max(0, tlW - vpW);
+  maxOffRef.current = maxOff;
   const clamp  = useCallback(v=>Math.max(0,Math.min(v,maxOff)),[maxOff]);
   const xOf    = useCallback(ah=>((ah-MIN_AH)/SPAN)*tlW,[tlW]);
 
@@ -830,13 +832,13 @@ export default function ShiaTimeline() {
               if(drag.current.dir==="h"){
                 // launch momentum scroll
                 let vx = momentum.current.vx * 1000; // px/s
-                const friction = 0.92;
+                const friction = 0.96;
                 const animate = () => {
-                  if(Math.abs(vx)<0.5){ momentum.current.raf=null; return; }
+                  if(Math.abs(vx)<0.3){ momentum.current.raf=null; return; }
                   vx *= friction;
                   setOffset(o=>{
                     const n=o-vx*0.016;
-                    return Math.max(0,Math.min(Math.max(0,vpW*zoom-vpW),n));
+                    return Math.max(0,Math.min(maxOffRef.current,n));
                   });
                   momentum.current.raf=requestAnimationFrame(animate);
                 };

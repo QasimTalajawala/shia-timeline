@@ -594,7 +594,8 @@ export default function ShiaTimeline() {
   const [expanded, setExpanded] = useState(new Set());
   const [filter, setFilter]   = useState("all");
   const drag  = useRef({ active:false, x0:0, off0:0 });
-  const pinch = useRef({ active:false, d0:0, z0:1 });
+  const pinch    = useRef({ active:false, d0:0, z0:1 });
+  const momentum = useRef({ vx:0, lastX:0, lastT:0, raf:null });
 
   useEffect(()=>{
     const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
@@ -781,9 +782,13 @@ export default function ShiaTimeline() {
             onMouseMove={e=>{ if(drag.current.active) setOffset(clamp(drag.current.off0+drag.current.x0-e.clientX)); }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
-            onTouchStart={e=>{ const t=e.touches[0]; drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null}; }}
+            onTouchStart={e=>{
+              if(momentum.current.raf){ cancelAnimationFrame(momentum.current.raf); momentum.current.raf=null; }
+              const t=e.touches[0];
+              drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null};
+              momentum.current={vx:0,lastX:t.clientX,lastT:Date.now(),raf:null};
+            }}
             onTouchMove={e=>{
-              // pinch: always handle and block
               if(e.touches.length===2){
                 e.preventDefault();
                 const dx=e.touches[0].clientX-e.touches[1].clientX;
@@ -794,8 +799,7 @@ export default function ShiaTimeline() {
                 if(!pinch.current.active){ pinch.current={active:true,d0:d,z0:zoom,lastD:d}; return; }
                 const delta=d/pinch.current.lastD;
                 pinch.current.lastD=d;
-                const curZoom=pinch.current.z0*(d/pinch.current.d0);
-                const nz=Math.max(1,Math.min(14,curZoom));
+                const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
                 const nMaxOff=Math.max(0,vpW*nz-vpW);
                 setZoom(nz);
                 setOffset(o=>Math.max(0,Math.min(nMaxOff,(o+pivot)*delta-pivot)));
@@ -805,19 +809,42 @@ export default function ShiaTimeline() {
               const t=e.touches[0];
               const dx=t.clientX-drag.current.x0;
               const dy=t.clientY-drag.current.y0;
-              // lock direction on first significant move
               if(!drag.current.dir){
-                if(Math.abs(dx)<4 && Math.abs(dy)<4) return; // too small to judge
-                drag.current.dir = Math.abs(dx)>Math.abs(dy) ? "h" : "v";
+                if(Math.abs(dx)<6&&Math.abs(dy)<6) return;
+                drag.current.dir=Math.abs(dx)>Math.abs(dy)?"h":"v";
               }
               if(drag.current.dir==="h"){
-                e.preventDefault(); // block page scroll only for horizontal drag
+                e.preventDefault();
                 pinch.current.active=false;
+                // track velocity
+                const now=Date.now();
+                const dt=Math.max(1,now-momentum.current.lastT);
+                momentum.current.vx=(t.clientX-momentum.current.lastX)/dt;
+                momentum.current.lastX=t.clientX;
+                momentum.current.lastT=now;
                 setOffset(clamp(drag.current.off0-dx));
               }
-              // vertical: do nothing — let browser handle page scroll naturally
             }}
-            onTouchEnd={()=>{ drag.current.active=false; pinch.current.active=false; }}
+            onTouchEnd={()=>{
+              pinch.current.active=false;
+              if(drag.current.dir==="h"){
+                // launch momentum scroll
+                let vx = momentum.current.vx * 1000; // px/s
+                const friction = 0.92;
+                const animate = () => {
+                  if(Math.abs(vx)<0.5){ momentum.current.raf=null; return; }
+                  vx *= friction;
+                  setOffset(o=>{
+                    const n=o-vx*0.016;
+                    return Math.max(0,Math.min(Math.max(0,vpW*zoom-vpW),n));
+                  });
+                  momentum.current.raf=requestAnimationFrame(animate);
+                };
+                momentum.current.raf=requestAnimationFrame(animate);
+              }
+              drag.current.active=false;
+              drag.current.dir=null;
+            }}
             style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
           >
             <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>

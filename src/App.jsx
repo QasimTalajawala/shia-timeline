@@ -591,58 +591,69 @@ const EVENTS = [
 export default function ShiaTimeline() {
   const vpRef    = useRef(null);
   const scrollRef = useRef(null);
-  const [vpW, setVpW]         = useState(900);
+  const [vpW, setVpW]         = useState(window.innerWidth||390);
   const [zoom, setZoom]       = useState(1);
-  const [offset, setOffset]   = useState(0);
+  const [offset, setOffset]   = useState(0); // mirrors scrollLeft for sticky labels
   const [sel, setSel]         = useState(null);
   const [expanded, setExpanded] = useState(new Set());
   const [filter, setFilter]   = useState("all");
-  const drag  = useRef({ active:false, x0:0, off0:0 });
-  const pinch    = useRef({ active:false, d0:0, z0:1 });
+  // stable refs — never stale inside event handlers
+  const zoomRef  = useRef(1);
+  const vpWRef   = useRef(window.innerWidth||390);
+  const drag     = useRef({ active:false, x0:0, y0:0, scrollX:0, dir:null });
+  const pinch    = useRef({ active:false, d0:0, z0:1, lastD:0 });
 
+  // Keep vpW and zoomRef always current
   useEffect(()=>{
-    const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
-    m(); window.addEventListener("resize",m);
+    const m=()=>{
+      const w = vpRef.current?.clientWidth || window.innerWidth;
+      setVpW(w); vpWRef.current=w;
+    };
+    m();
+    window.addEventListener("resize",m);
     return ()=>window.removeEventListener("resize",m);
   },[]);
 
-  // Attach wheel listener non-passively so preventDefault works
+  const tlW = vpW * zoom;
+  const xOf = useCallback(ah=>((ah-MIN_AH)/SPAN)*(vpWRef.current*zoomRef.current),[zoom,vpW]);
+
+  // Non-passive wheel: pinch-on-trackpad zooms, scroll pans
   useEffect(()=>{
     const el = scrollRef.current;
     if(!el) return;
-    const handler = (e) => {
+    const onWheel = (e)=>{
       if(e.ctrlKey||e.metaKey){
         e.preventDefault();
-        doZoom(e.deltaY<0?"in":"out", e.clientX-el.getBoundingClientRect().left);
-      } else {
-        // let native scroll handle it
+        const pivot = e.clientX - el.getBoundingClientRect().left;
+        applyZoom(e.deltaY<0?1.12:1/1.12, pivot);
       }
+      // plain scroll: let browser handle natively
     };
-    el.addEventListener("wheel", handler, { passive:false });
-    return ()=>el.removeEventListener("wheel", handler);
-  },[zoom]);
+    el.addEventListener("wheel", onWheel, { passive:false });
+    return ()=>el.removeEventListener("wheel", onWheel);
+  },[]); // empty deps — handler always reads from refs, never stale
 
-  const tlW    = vpW * zoom;
-  const xOf    = useCallback(ah=>((ah-MIN_AH)/SPAN)*tlW,[tlW]);
-
-  function doZoom(dir, pivot, nzOverride){
-    const p=pivot??vpW/2;
-    setZoom(z=>{
-      const nz=nzOverride??( dir==="in"?Math.min(z*1.6,14):Math.max(z/1.6,1) );
-      // adjust native scroll position to keep pivot in place
-      requestAnimationFrame(()=>{
-        if(scrollRef.current){
-          const curScroll = scrollRef.current.scrollLeft;
-          scrollRef.current.scrollLeft = (curScroll+p)*(nz/z)-p;
-        }
-      });
-      return nz;
+  // Core zoom function — uses refs so never stale inside closures
+  function applyZoom(factor, pivotPx){
+    const curZ  = zoomRef.current;
+    const curVpW = vpWRef.current;
+    const nz    = Math.max(1, Math.min(14, curZ * factor));
+    const p     = pivotPx ?? curVpW/2;
+    const curScroll = scrollRef.current?.scrollLeft ?? 0;
+    const newScroll = (curScroll + p) * (nz/curZ) - p;
+    zoomRef.current = nz;
+    setZoom(nz);
+    // apply scroll after DOM updates with new tlW
+    requestAnimationFrame(()=>{
+      if(scrollRef.current){
+        scrollRef.current.scrollLeft = Math.max(0, newScroll);
+      }
     });
   }
-  function onWheel(e){
-    e.preventDefault();
-    if(e.ctrlKey||e.metaKey) doZoom(e.deltaY<0?"in":"out",e.clientX-e.currentTarget.getBoundingClientRect().left);
-    else if(scrollRef.current) scrollRef.current.scrollBy({ left: e.deltaX+e.deltaY*0.5 });
+
+  // kept for zoom buttons
+  function doZoom(dir, pivot){
+    applyZoom(dir==="in"?1.6:1/1.6, pivot);
   }
 
   function toggleExpand(id){
@@ -799,16 +810,24 @@ export default function ShiaTimeline() {
         <div ref={vpRef} style={{ flex:1, minWidth:0 }}>
           <div
             ref={scrollRef}
-            onScroll={e=>setOffset(e.target.scrollLeft)}
+            onScroll={e=>{ const sl=e.currentTarget.scrollLeft; if(Math.abs(sl-offset)>2) setOffset(sl); }}
             onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,scrollX:scrollRef.current?.scrollLeft||0}; }}
-            onMouseMove={e=>{ if(drag.current.active && scrollRef.current) scrollRef.current.scrollLeft=drag.current.scrollX+drag.current.x0-e.clientX; }}
+            onMouseMove={e=>{ if(!drag.current.active) return; scrollRef.current.scrollLeft=drag.current.scrollX-(e.clientX-drag.current.x0); }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
             onTouchStart={e=>{
+              pinch.current.active=false;
               if(e.touches.length===1){
                 const t=e.touches[0];
                 drag.current={active:true,x0:t.clientX,y0:t.clientY,scrollX:scrollRef.current?.scrollLeft||0,dir:null};
-                pinch.current.active=false;
+              } else if(e.touches.length===2){
+                drag.current.active=false;
+                const dx=e.touches[0].clientX-e.touches[1].clientX;
+                const dy=e.touches[0].clientY-e.touches[1].clientY;
+                const d=Math.sqrt(dx*dx+dy*dy);
+                const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
+                pinch.current={active:true,d0:d,lastD:d,z0:zoomRef.current,
+                  pivot:midX-(scrollRef.current?.getBoundingClientRect().left||0)};
               }
             }}
             onTouchMove={e=>{
@@ -817,12 +836,18 @@ export default function ShiaTimeline() {
                 const dx=e.touches[0].clientX-e.touches[1].clientX;
                 const dy=e.touches[0].clientY-e.touches[1].clientY;
                 const d=Math.sqrt(dx*dx+dy*dy);
-                const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-                const pivot=midX-(scrollRef.current?.getBoundingClientRect().left||0);
-                if(!pinch.current.active){ pinch.current={active:true,d0:d,z0:zoom,lastD:d}; return; }
+                if(!pinch.current.active) return;
+                const factor=d/pinch.current.lastD;
                 pinch.current.lastD=d;
-                const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
-                doZoom(null,pivot,nz);
+                const nz=Math.max(1,Math.min(14,zoomRef.current*factor));
+                const p=pinch.current.pivot;
+                const curScroll=scrollRef.current?.scrollLeft||0;
+                zoomRef.current=nz;
+                setZoom(nz);
+                requestAnimationFrame(()=>{
+                  if(scrollRef.current)
+                    scrollRef.current.scrollLeft=Math.max(0,(curScroll+p)*factor-p);
+                });
                 return;
               }
               if(!drag.current.active) return;
@@ -830,18 +855,18 @@ export default function ShiaTimeline() {
               const dx=t.clientX-drag.current.x0;
               const dy=t.clientY-drag.current.y0;
               if(!drag.current.dir){
-                if(Math.abs(dx)<6&&Math.abs(dy)<6) return;
-                drag.current.dir=Math.abs(dx)>Math.abs(dy)?"h":"v";
+                if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
+                drag.current.dir=Math.abs(dx)>=Math.abs(dy)?"h":"v";
               }
               if(drag.current.dir==="h"){
                 e.preventDefault();
-                if(scrollRef.current) scrollRef.current.scrollLeft=drag.current.scrollX-dx;
+                scrollRef.current.scrollLeft=drag.current.scrollX-dx;
               }
             }}
             onTouchEnd={()=>{ drag.current.active=false; drag.current.dir=null; pinch.current.active=false; }}
-            style={{ overflowX:"auto", overflowY:"hidden", WebkitOverflowScrolling:"touch",
-              cursor:drag.current.active?"grabbing":"grab", userSelect:"none",
-              touchAction:"pan-x pan-y",ight:canvasH }}
+            style={{ overflowX:"scroll", overflowY:"hidden", WebkitOverflowScrolling:"touch",
+              cursor:"grab", userSelect:"none",
+              touchAction:"pan-y",ight:canvasH }}
           >
             <div style={{ width:tlW, height:canvasH, position:"relative" }}>
 

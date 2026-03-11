@@ -4,17 +4,17 @@ import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 //  CONSTANTS
 // ─────────────────────────────────────────────────────────────
 const MIN_AH   = -135;
-const MAX_AH   = 365; // extra right padding so last bars aren't at edge
+const MAX_AH   = 345;
 const SPAN     = MAX_AH - MIN_AH;
-const BAR_H      = 15;
-const BAR_GAP    = 6;   // gap below bar (before button or next row)
-const BTN_H      = 14;  // expand/collapse button height
-const BTN_GAP    = 6;   // gap after button to next row
-const SUB_H      = 12;  // companion sub-row bar height
-const ROW_H      = BAR_H + BAR_GAP;                    // family / no-ashaab rows
-const MASOOM_ROW_H = BAR_H + BAR_GAP + BTN_H + BTN_GAP; // masoom rows with button
-const SUB_ROW_H  = SUB_H + 6;
-const EVT_ZONE_H = 160; // dedicated band at top for event labels above axis
+const BAR_H        = 15;
+const BAR_GAP      = 6;
+const BTN_H        = 14;
+const BTN_GAP      = 6;
+const SUB_H        = 12;
+const ROW_H        = BAR_H + BAR_GAP;
+const MASOOM_ROW_H = BAR_H + BAR_GAP + BTN_H + BTN_GAP;
+const SUB_ROW_H    = SUB_H + 6;
+const EVT_ZONE_H = 130; // dedicated band at top for event labels above axis
 const AXIS_H    = EVT_ZONE_H; // axis line sits at bottom of event zone
 
 const C_MASOOM    = "#E8B84B";
@@ -524,63 +524,6 @@ const EVENTS = [
     detail:"Mukhtar al-Thaqafi rose in Kufa avenging Karbala. He executed Ubaydullah ibn Ziyad, Shimr, and others responsible." },
   { id:"sughra",  ah:260, label:"Minor Occultation",    hdate:"260 AH",                ce:"874 CE", color:"#9B7BC4", pri:2, side:"above", arabic:"الغيبة الصغرى",
     detail:"Upon Imam al-Askari's (AS) martyrdom, the 12th Imam entered the Minor Occultation, communicating through four deputies over ~69 years." },
-  // ── PRE-HIJRA ──
-  { id:"isramiraj",  ah:-2,   label:"Isra wal Miraj ★",       hdate:"27 Rajab, 11 BH",        ce:"620 CE", color:"#F7E070", pri:3, side:"above", arabic:"الإسراء والمعراج",
-    detail:"The miraculous night journey of the Prophet ﷺ from Mecca to Jerusalem, then ascent through the heavens. He met the previous Prophets and received the commandment of Salah." },
-  { id:"layla_mabit", ah:1,   label:"Laylat al-Mabit",         hdate:"1 AH",                   ce:"622 CE", color:"#5EC48A", pri:2, side:"above", arabic:"ليلة المبيت",
-    detail:"On the eve of the Hijra, Imam Ali (AS) slept in the Prophet's ﷺ bed to deceive the assassins gathered outside, offering his life to protect the Prophet. Verse 2:207 was revealed about this act of sacrifice." },
-  // ── MADINAN ──
-  { id:"khandaq",    ah:5,    label:"Khandaq",                 hdate:"Shawwal, 5 AH",          ce:"627 CE", color:"#E07B54", pri:2, side:"above", arabic:"غزوة الخندق",
-    detail:"Battle of the Trench. Imam Ali (AS) killed Amr ibn Abd Wudd in single combat — the Prophet ﷺ declared it equal to all the worship of both worlds." },
-  { id:"hudaybiyya", ah:6,    label:"Treaty of Hudaybiyyah",   hdate:"Dhul Qa'da, 6 AH",       ce:"628 CE", color:"#9B84B0", pri:2, side:"above", arabic:"صلح الحديبية",
-    detail:"A 10-year truce with Quraysh, seen initially as a setback. Described by the Quran as a 'manifest victory' (48:1). It enabled the spread of Islam across Arabia." },
-  { id:"khaybar",    ah:7,    label:"Khaybar",                 hdate:"Muharram, 7 AH",         ce:"628 CE", color:"#E07B54", pri:2, side:"above", arabic:"غزوة خيبر",
-    detail:"Imam Ali (AS) conquered the fortress of Khaybar after others had failed. The Prophet ﷺ declared: 'I will give the flag to one who loves Allah and His Prophet.' A poisoned lamb was served here — the effects of which led to the Prophet's ﷺ eventual martyrdom." },
-  { id:"hajj_wada",  ah:10,   label:"Hajjat al-Wada",          hdate:"Dhul Hijja, 10 AH",      ce:"632 CE", color:"#F7D060", pri:2, side:"above", arabic:"حجة الوداع",
-    detail:"The Prophet's ﷺ farewell pilgrimage. On the return, at Ghadeer Khumm, he declared Imam Ali's (AS) succession before 120,000+ companions." },
-  // ── POST-PROPHET ──
-  { id:"saqifa",     ah:11,   label:"Saqifa",                  hdate:"11 AH",                  ce:"632 CE", color:"#C0392B", pri:2, side:"above", arabic:"سقيفة بني ساعدة",
-    detail:"While Imam Ali (AS) prepared the Prophet's ﷺ burial, a gathering at Saqifa Bani Sa'ida installed Abu Bakr as caliph. Imam Ali (AS) and the Ahl al-Bayt were not consulted. This event is regarded by Shia Muslims as a usurpation of the divinely ordained succession." },
-  { id:"fadak",      ah:11,   label:"Fadak",                   hdate:"11 AH",                  ce:"632 CE", color:"#C0392B", pri:2, side:"above", arabic:"فدك",
-    detail:"Sayyida Fatimah Zahra (AS) delivered her famous Fadakiyya sermon demanding the return of Fadak — the garden gifted to her by the Prophet ﷺ. Her claim and her testimony as daughter of the Prophet ﷺ were rejected. She passed away 75 days after the Prophet ﷺ, grief-stricken." },
-  { id:"shura",      ah:23,   label:"Shura — Uthman",          hdate:"23 AH",                  ce:"644 CE", color:"#9B84B0", pri:1, side:"above", arabic:"مجلس الشورى",
-    detail:"After Umar's death, a 6-member council (shura) selected Uthman as caliph over Imam Ali (AS). Imam Ali (AS) accepted to preserve Muslim unity." },
-  { id:"uthman_kill",ah:35,   label:"Assassination of Uthman", hdate:"35 AH",                  ce:"656 CE", color:"#E07B54", pri:1, side:"above", arabic:"مقتل عثمان",
-    detail:"Uthman was killed by discontented Muslims. Imam Ali (AS) was finally accepted as caliph — but immediately faced opposition from Muawiyah and others." },
-  { id:"nahrawan",   ah:38,   label:"Nahrawan",                hdate:"38 AH",                  ce:"658 CE", color:"#E07B54", pri:1, side:"above", arabic:"معركة النهروان",
-    detail:"Imam Ali (AS) fought the Khawarij — the first sectarian extremist group in Islam — who had defected after Siffin. The battle ended in their near-total defeat." },
-  { id:"hasan_treaty",ah:41,  label:"Treaty of Imam Hasan (AS)",hdate:"41 AH",                 ce:"661 CE", color:"#9B84B0", pri:2, side:"above", arabic:"صلح الإمام الحسن",
-    detail:"Under threat of war and betrayal by his own commanders, Imam Hasan (AS) negotiated a conditional treaty with Muawiyah to preserve Muslim lives and the Imamate. Conditions were later violated by Muawiyah." },
-  { id:"hujr",       ah:51,   label:"Martyrdom of Hujr ibn Adi",hdate:"51 AH",                ce:"671 CE", color:"#E07B54", pri:1, side:"above", arabic:"شهادة حجر بن عدي",
-    detail:"Hujr ibn Adi (RA) and his companions were executed by Muawiyah for refusing to curse Imam Ali (AS) in public prayers — among the first state-sponsored Shia martyrdoms after Karbala's causes began forming." },
-  { id:"yazid_appt", ah:60,   label:"Yazid Demands Bay'ah",    hdate:"60 AH",                  ce:"680 CE", color:"#C0392B", pri:2, side:"above", arabic:"مطالبة يزيد بالبيعة",
-    detail:"On Muawiyah's death, Yazid demanded allegiance. Imam Husayn (AS) refused, declaring: 'One like me does not give allegiance to one like him.' He departed from Medina toward Karbala." },
-  { id:"captives",   ah:62,   label:"Return of Karbala Captives",hdate:"62 AH",                ce:"681 CE", color:"#9B84B0", pri:1, side:"above", arabic:"عودة السبايا",
-    detail:"Imam Sajjad (AS) and Sayyida Zaynab (SA) returned to Medina after their ordeal in Kufa and Damascus, where Imam Sajjad's (AS) sermon and Zaynab's (SA) speeches had already exposed Yazid's crimes to the Muslim world." },
-  { id:"harrah",     ah:63,   label:"Massacre of Harrah",       hdate:"63 AH",                 ce:"683 CE", color:"#E07B54", pri:1, side:"above", arabic:"وقعة الحرة",
-    detail:"Yazid's army under Muslim ibn Uqba massacred the people of Medina. The city was given over to plunder for three days. A dark chapter in early Islamic history." },
-  { id:"tawwabeen",  ah:65,   label:"Tawwabeen Uprising",       hdate:"65 AH",                 ce:"684 CE", color:"#7EB8C9", pri:2, side:"above", arabic:"ثورة التوابين",
-    detail:"The Penitents — Kufans who felt guilt for abandoning Imam Husayn (AS) — rose under Sulayman ibn Surad to avenge Karbala. Most were martyred at Ain al-Warda against the Umayyad forces." },
-  // ── LATER UMAYYAD ──
-  { id:"zayd_uprising",ah:122, label:"Uprising of Zayd ibn Ali", hdate:"122 AH",               ce:"740 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة زيد بن علي",
-    detail:"Zayd ibn Ali, son of Imam Sajjad (AS), rose against the Umayyad caliph Hisham in Kufa. He was martyred, his body crucified. His uprising inspired future Alid revolts." },
-  { id:"yahya_zayd", ah:125,  label:"Uprising of Yahya ibn Zayd",hdate:"125 AH",               ce:"743 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة يحيى بن زيد",
-    detail:"Yahya ibn Zayd continued his father's revolt in Khorasan and was martyred. His death further galvanised anti-Umayyad sentiment, contributing to the Abbasid revolution." },
-  { id:"abbasid",    ah:132,  label:"Fall of Umayyads",         hdate:"132 AH",                ce:"750 CE", color:"#9B84B0", pri:2, side:"above", arabic:"سقوط الدولة الأموية",
-    detail:"The Abbasid Revolution ended Umayyad rule. Initially welcomed by Shia Muslims, the Abbasids soon proved equally hostile to the Imams — most of whom they imprisoned or poisoned." },
-  { id:"nafs_zakiyya",ah:145, label:"Nafs al-Zakiyya Revolt",   hdate:"145 AH",                ce:"762 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة النفس الزكية",
-    detail:"Muhammad ibn Abd Allah al-Hasani (al-Nafs al-Zakiyya) rose against the Abbasids in Medina and was martyred. His revolt forced Imam Sadiq (AS) to navigate a delicate political position." },
-  // ── ABBASID PERIOD ──
-  { id:"kadhim_prison",ah:179,label:"Imam Kadhim (AS) Imprisoned",hdate:"179 AH",              ce:"795 CE", color:"#C0392B", pri:2, side:"above", arabic:"سجن الإمام الكاظم",
-    detail:"Harun al-Rashid had Imam Kadhim (AS) imprisoned in Baghdad after years of surveillance. The Imam spent his final years in various prisons, and was martyred by poisoning in 183 AH." },
-  { id:"ridha_wali",  ah:201, label:"Imam Ridha (AS) — Crown Prince",hdate:"201 AH",           ce:"817 CE", color:"#9B84B0", pri:2, side:"above", arabic:"ولاية العهد",
-    detail:"Caliph Ma'mun appointed Imam Ridha (AS) as his crown prince — seen by historians as an attempt to neutralise Alid opposition. The Imam accepted under duress. He was martyred by poisoning two years later." },
-  { id:"masuma_qum",  ah:201, label:"Sayyida Masuma (SA) in Qum", hdate:"201 AH",              ce:"816 CE", color:"#5EC48A", pri:2, side:"above", arabic:"قدوم السيدة فاطمة المعصومة",
-    detail:"Sayyida Fatimah al-Masuma (SA), sister of Imam Ridha (AS), journeyed from Medina to join her brother in Khorasan. She fell ill and passed away in Qum — which became one of the holiest Shia cities." },
-  { id:"mutawakkil",  ah:237, label:"Mutawakkil's Persecution",   hdate:"237 AH",              ce:"851 CE", color:"#C0392B", pri:2, side:"above", arabic:"اضطهاد المتوكل",
-    detail:"Abbasid caliph Mutawakkil ordered the demolition of Imam Husayn's (AS) shrine in Karbala and forbade pilgrimages to the site. He intensified persecution of Shia Muslims and placed Imam Hadi (AS) under house arrest." },
-  { id:"samarra",     ah:243, label:"Imam Hadi (AS) to Samarra",  hdate:"243 AH",              ce:"857 CE", color:"#C0392B", pri:1, side:"above", arabic:"نقل الإمام الهادي إلى سامراء",
-    detail:"Mutawakkil summoned Imam Hadi (AS) from Medina to Samarra to keep him under close surveillance. The Imam spent the rest of his life under virtual house arrest there. Imam Askari (AS) was also confined in Samarra." },
   { id:"kubra",   ah:329, label:"MAJOR OCCULTATION ★",  hdate:"329 AH",                ce:"941 CE", color:"#7B5BC4", pri:3, side:"above", arabic:"الغيبة الكبرى",
     detail:"Ali ibn Muhammad al-Samarri's death marked the beginning of the Major Occultation. The Imam is hidden until the Zuhur." },
 ];
@@ -590,71 +533,56 @@ const EVENTS = [
 // ─────────────────────────────────────────────────────────────
 export default function ShiaTimeline() {
   const vpRef    = useRef(null);
-  const scrollRef = useRef(null);
-  const [vpW, setVpW]         = useState(window.innerWidth||390);
+  const outerRef = useRef(null); // scrollable viewport
+  const innerRef = useRef(null); // scaled inner canvas during pinch
+  const [vpW, setVpW]         = useState(900);
   const [zoom, setZoom]       = useState(1);
-  const [offset, setOffset]   = useState(0); // mirrors scrollLeft for sticky labels
+  const [offset, setOffset]   = useState(0);
   const [sel, setSel]         = useState(null);
   const [expanded, setExpanded] = useState(new Set());
   const [filter, setFilter]   = useState("all");
-  // stable refs — never stale inside event handlers
-  const zoomRef  = useRef(1);
-  const vpWRef   = useRef(window.innerWidth||390);
-  const drag     = useRef({ active:false, x0:0, y0:0, scrollX:0, dir:null });
-  const pinch    = useRef({ active:false, d0:0, z0:1, lastD:0 });
+  const drag   = useRef({ active:false, x0:0, y0:0, off0:0, dir:null });
+  const pinch  = useRef({ active:false, d0:0, z0:1, pivot:0 });
 
-  // Keep vpW and zoomRef always current
   useEffect(()=>{
-    const m=()=>{
-      const w = vpRef.current?.clientWidth || window.innerWidth;
-      setVpW(w); vpWRef.current=w;
-    };
-    m();
-    window.addEventListener("resize",m);
+    const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
+    m(); window.addEventListener("resize",m);
     return ()=>window.removeEventListener("resize",m);
   },[]);
 
-  const tlW = vpW * zoom;
-  const xOf = useCallback(ah=>((ah-MIN_AH)/SPAN)*(vpWRef.current*zoomRef.current),[zoom,vpW]);
+  const tlW   = vpW * zoom;
+  const maxOff= Math.max(0, tlW - vpW);
+  const clamp = useCallback(v=>Math.max(0,Math.min(v,maxOff)),[maxOff]);
+  const xOf   = useCallback(ah=>((ah-MIN_AH)/SPAN)*tlW,[tlW]);
 
-  // Non-passive wheel: pinch-on-trackpad zooms, scroll pans
-  useEffect(()=>{
-    const el = scrollRef.current;
-    if(!el) return;
-    const onWheel = (e)=>{
-      if(e.ctrlKey||e.metaKey){
-        e.preventDefault();
-        const pivot = e.clientX - el.getBoundingClientRect().left;
-        applyZoom(e.deltaY<0?1.12:1/1.12, pivot);
-      }
-      // plain scroll: let browser handle natively
-    };
-    el.addEventListener("wheel", onWheel, { passive:false });
-    return ()=>el.removeEventListener("wheel", onWheel);
-  },[]); // empty deps — handler always reads from refs, never stale
+  useEffect(()=>{ setOffset(o=>clamp(o)); },[zoom,clamp]);
 
-  // Core zoom function — uses refs so never stale inside closures
-  function applyZoom(factor, pivotPx){
-    const curZ  = zoomRef.current;
-    const curVpW = vpWRef.current;
-    const nz    = Math.max(1, Math.min(14, curZ * factor));
-    const p     = pivotPx ?? curVpW/2;
-    const curScroll = scrollRef.current?.scrollLeft ?? 0;
-    const newScroll = (curScroll + p) * (nz/curZ) - p;
-    zoomRef.current = nz;
-    setZoom(nz);
-    // apply scroll after DOM updates with new tlW
-    requestAnimationFrame(()=>{
-      if(scrollRef.current){
-        scrollRef.current.scrollLeft = Math.max(0, newScroll);
-      }
+  // Zoom buttons and trackpad
+  function doZoom(dir, pivot){
+    const p = pivot ?? vpW/2;
+    setZoom(z=>{
+      const nz = dir==="in" ? Math.min(z*1.6,14) : Math.max(z/1.6,1);
+      setOffset(o=>clamp((o+p)*(nz/z)-p));
+      return nz;
     });
   }
 
-  // kept for zoom buttons
-  function doZoom(dir, pivot){
-    applyZoom(dir==="in"?1.6:1/1.6, pivot);
-  }
+  // Non-passive wheel (must be added imperatively)
+  useEffect(()=>{
+    const el = outerRef.current;
+    if(!el) return;
+    const onWheel = e=>{
+      e.preventDefault();
+      if(e.ctrlKey||e.metaKey){
+        const pivot = e.clientX - el.getBoundingClientRect().left + offset;
+        doZoom(e.deltaY<0?"in":"out", pivot-offset);
+      } else {
+        setOffset(o=>clamp(o + e.deltaX + e.deltaY*0.5));
+      }
+    };
+    el.addEventListener("wheel", onWheel, {passive:false});
+    return ()=>el.removeEventListener("wheel", onWheel);
+  },[zoom, offset, clamp, vpW]);
 
   function toggleExpand(id){
     setExpanded(prev=>{
@@ -664,19 +592,18 @@ export default function ShiaTimeline() {
     });
   }
 
-  // ── Build dynamic row list ──
+  // ── Build dynamic row list — single chronological list sorted by birthAH ──
   const rows = useMemo(()=>{
     const list=[];
-    const compMode = filter==="companions";
+    const compMode   = filter==="companions";
     const showMasoom = filter==="all"||filter==="masoomeen"||compMode;
     const showFamily = filter==="all"||filter==="family";
-    const showComp   = filter==="all"||compMode;
 
-    // Build master list: merge Masoomeen + Family, sort by birthAH
+    // Build primary entries (Masoomeen + Family) merged and sorted by birthAH
     const allPrimary = [];
     if(showMasoom){
       for(const m of MASOOMEEN){
-        allPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:(m.ashaab&&m.ashaab.length>0&&(filter==="all"||filter==="companions")?MASOOM_ROW_H:ROW_H) });
+        allPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:(m.ashaab&&m.ashaab.length>0?MASOOM_ROW_H:ROW_H) });
       }
     }
     if(showFamily){
@@ -684,15 +611,15 @@ export default function ShiaTimeline() {
         allPrimary.push({ type:"family", data:f, color:C_FAMILY, h:ROW_H });
       }
     }
-    // Sort chronologically by birthAH
-    allPrimary.sort((a,b)=> a.data.birthAH - b.data.birthAH);
+    // Sort merged list by birthAH
+    allPrimary.sort((a,b)=>a.data.birthAH - b.data.birthAH);
 
-    // Insert companion sub-rows immediately after their parent Imam
+    // Insert primary rows, and companion sub-rows immediately after their Imam
     for(const row of allPrimary){
       list.push(row);
-      if(row.type==="masoom" && showComp){
+      if(row.type==="masoom"){
         const m = row.data;
-        const showSubs = m.ashaab && m.ashaab.length>0 && (compMode || expanded.has(m.id));
+        const showSubs = m.ashaab && m.ashaab.length>0 && (compMode || (filter==="all" && expanded.has(m.id)));
         if(showSubs){
           for(const a of m.ashaab){
             list.push({ type:"companion", data:a, color:C_COMPANION, h:SUB_ROW_H, parentId:m.id });
@@ -726,7 +653,7 @@ export default function ShiaTimeline() {
     const mapped = EVENTS.map(ev => {
       const visible = ev.pri===3 || (ev.pri===2 && zoom>=1.5) || zoom>=2.8;
       const slot = ev.side==="above" ? evAbove++ : evBelow++;
-      const lv = 6 + (slot%4)*30;
+      const lv = 8 + (slot%4)*28;
       const labelY = ev.side==="above" ? lv : baseBelow+lv;
       return { ...ev, labelY, _vis: visible };
     });
@@ -809,66 +736,59 @@ export default function ShiaTimeline() {
 
         <div ref={vpRef} style={{ flex:1, minWidth:0 }}>
           <div
-            ref={scrollRef}
-            onScroll={e=>{ const sl=e.currentTarget.scrollLeft; if(Math.abs(sl-offset)>2) setOffset(sl); }}
-            onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,scrollX:scrollRef.current?.scrollLeft||0}; }}
-            onMouseMove={e=>{ if(!drag.current.active) return; scrollRef.current.scrollLeft=drag.current.scrollX-(e.clientX-drag.current.x0); }}
+            ref={outerRef}
+            onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,off0:offset,dir:null}; }}
+            onMouseMove={e=>{ if(drag.current.active) setOffset(clamp(drag.current.off0+drag.current.x0-e.clientX)); }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
             onTouchStart={e=>{
-              pinch.current.active=false;
+              drag.current.active=false; pinch.current.active=false;
               if(e.touches.length===1){
                 const t=e.touches[0];
-                drag.current={active:true,x0:t.clientX,y0:t.clientY,scrollX:scrollRef.current?.scrollLeft||0,dir:null};
+                drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null};
               } else if(e.touches.length===2){
-                drag.current.active=false;
-                const dx=e.touches[0].clientX-e.touches[1].clientX;
-                const dy=e.touches[0].clientY-e.touches[1].clientY;
+                const t0=e.touches[0],t1=e.touches[1];
+                const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
                 const d=Math.sqrt(dx*dx+dy*dy);
-                const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-                pinch.current={active:true,d0:d,lastD:d,z0:zoomRef.current,
-                  pivot:midX-(scrollRef.current?.getBoundingClientRect().left||0)};
+                const midX=(t0.clientX+t1.clientX)/2-e.currentTarget.getBoundingClientRect().left;
+                pinch.current={active:true,d0:d,lastD:d,z0:zoom,pivot:midX,off0:offset};
               }
             }}
             onTouchMove={e=>{
               if(e.touches.length===2){
                 e.preventDefault();
-                const dx=e.touches[0].clientX-e.touches[1].clientX;
-                const dy=e.touches[0].clientY-e.touches[1].clientY;
-                const d=Math.sqrt(dx*dx+dy*dy);
                 if(!pinch.current.active) return;
-                const factor=d/pinch.current.lastD;
-                pinch.current.lastD=d;
-                const nz=Math.max(1,Math.min(14,zoomRef.current*factor));
-                const p=pinch.current.pivot;
-                const curScroll=scrollRef.current?.scrollLeft||0;
-                zoomRef.current=nz;
+                const t0=e.touches[0],t1=e.touches[1];
+                const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
+                const d=Math.sqrt(dx*dx+dy*dy);
+                const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
+                const pivot=pinch.current.pivot;
+                const nMaxOff=Math.max(0,vpW*nz-vpW);
                 setZoom(nz);
-                requestAnimationFrame(()=>{
-                  if(scrollRef.current)
-                    scrollRef.current.scrollLeft=Math.max(0,(curScroll+p)*factor-p);
-                });
+                setOffset(Math.max(0,Math.min(nMaxOff,(pinch.current.off0+pivot)*(nz/pinch.current.z0)-pivot)));
                 return;
               }
               if(!drag.current.active) return;
               const t=e.touches[0];
-              const dx=t.clientX-drag.current.x0;
-              const dy=t.clientY-drag.current.y0;
+              const dx=t.clientX-drag.current.x0,dy=t.clientY-drag.current.y0;
               if(!drag.current.dir){
                 if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
                 drag.current.dir=Math.abs(dx)>=Math.abs(dy)?"h":"v";
               }
-              if(drag.current.dir==="h"){
-                e.preventDefault();
-                scrollRef.current.scrollLeft=drag.current.scrollX-dx;
+              if(drag.current.dir==="h"){ e.preventDefault(); setOffset(clamp(drag.current.off0+drag.current.x0-t.clientX)); }
+            }}
+            onTouchEnd={e=>{
+              if(e.touches.length===0){
+                drag.current.active=false; drag.current.dir=null; pinch.current.active=false;
+              } else if(e.touches.length===1&&pinch.current.active){
+                pinch.current.active=false;
+                const t=e.touches[0];
+                drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null};
               }
             }}
-            onTouchEnd={()=>{ drag.current.active=false; drag.current.dir=null; pinch.current.active=false; }}
-            style={{ overflowX:"scroll", overflowY:"hidden", WebkitOverflowScrolling:"touch",
-              cursor:"grab", userSelect:"none",
-              touchAction:"pan-y",ight:canvasH }}
+            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
           >
-            <div style={{ width:tlW, height:canvasH, position:"relative" }}>
+            <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>
 
               {/* Reference lines */}
               {[{ah:1,c:"rgba(126,184,201,0.08)"},{ah:61,c:"rgba(230,57,70,0.09)"},{ah:10,c:"rgba(245,197,24,0.06)"}].map(({ah,c})=>(
@@ -879,12 +799,11 @@ export default function ShiaTimeline() {
               <div style={{ position:"absolute",top:AXIS_H-1,left:0,right:0,height:1,background:"rgba(184,146,74,0.35)" }}/>
               {ticks.map(y=>{
                 const x=xOf(y),isMajor=y%100===0||y===1,isMid=y%50===0&&!isMajor;
-                const tickH=isMajor?14:isMid?9:5;
                 return (
-                  <div key={y} style={{ position:"absolute",left:x,top:AXIS_H-tickH }}>
-                    <div style={{ position:"absolute",top:0,left:0,width:1,height:tickH,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
+                  <div key={y} style={{ position:"absolute",left:x,top:AXIS_H-1 }}>
+                    <div style={{ position:"absolute",top:0,left:0,width:1,height:isMajor?14:isMid?9:5,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
                     {(isMajor||isMid||zoom>2)&&(
-                      <div style={{ position:"absolute",bottom:tickH+3,left:y===1?-24:y<0?-14:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
+                      <div style={{ position:"absolute",top:16,left:y===1?-24:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
                         {y===1?"1 AH · Hijra ✦":ahLabel(y)}
                       </div>
                     )}
@@ -978,27 +897,23 @@ export default function ShiaTimeline() {
                       }}>◉</div>
                     )}
                     {/* Companion expand/collapse button */}
-                    {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
+                    {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&(filter==="all"||filter==="companions")&&(
                       <div
                         onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
                         style={{
-                          position:"absolute",
-                          left:bx, top:top+BAR_H+BAR_GAP,
+                          position:"absolute", left:bx, top:top+BAR_H+BAR_GAP,
                           width:Math.min(barW,130), height:BTN_H,
                           display:"flex", alignItems:"center", justifyContent:"center", gap:4,
-                          background:expanded.has(d.id)?`${row.color}28`:`${row.color}18`,
+                          background:expanded.has(d.id)?`${row.color}28`:`${row.color}16`,
                           borderRadius:"0 0 6px 6px",
-                          border:`1px solid ${row.color}${expanded.has(d.id)?"55":"35"}`,
+                          border:`1px solid ${row.color}${expanded.has(d.id)?"55":"30"}`,
                           borderTop:"none",
                           cursor:"pointer", WebkitTapHighlightColor:"transparent",
                           userSelect:"none", zIndex:4,
-                          transition:"background 0.2s",
                         }}
                       >
-                        <span style={{fontSize:7, color:`${row.color}${expanded.has(d.id)?"cc":"88"}`, letterSpacing:"0.05em", fontFamily:"sans-serif"}}>
-                          {expanded.has(d.id)
-                            ? `▲ hide companions`
-                            : `▼ ${d.ashaab.length} companions`}
+                        <span style={{fontSize:7,color:`${row.color}${expanded.has(d.id)?"cc":"88"}`,letterSpacing:"0.05em"}}>
+                          {expanded.has(d.id)?"▲ hide companions":`▼ ${d.ashaab.length} companions`}
                         </span>
                       </div>
                     )}
@@ -1047,7 +962,7 @@ export default function ShiaTimeline() {
 
       {/* Stats */}
       <div style={{ display:"flex",justifyContent:"center",gap:18,padding:"4px 16px 12px",flexWrap:"wrap" }}>
-        {[["14","Masoomeen (AS)"],["12","Ahl al-Bayt & Family"],["52","Companions & Deputies"],["40","Major Events"]].map(([n,l])=>(
+        {[["14","Masoomeen (AS)"],["12","Family Personalities"],["52","Companions & Deputies"],["14","Major Events"]].map(([n,l])=>(
           <div key={l} style={{ textAlign:"center" }}>
             <div style={{ fontSize:15,color:"#F5C842" }}>{n}</div>
             <div style={{ fontSize:8,color:"#6A7C8A",textTransform:"uppercase",letterSpacing:"0.07em" }}>{l}</div>

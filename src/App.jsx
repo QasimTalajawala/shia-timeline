@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 
 // ─────────────────────────────────────────────────────────────
 //  CONSTANTS
@@ -14,7 +14,7 @@ const SUB_H        = 12;
 const ROW_H        = BAR_H + BAR_GAP;
 const MASOOM_ROW_H = BAR_H + BAR_GAP + BTN_H + BTN_GAP;
 const SUB_ROW_H    = SUB_H + 6;
-const EVT_ZONE_H = 130; // dedicated band at top for event labels above axis
+const EVT_ZONE_H = 160; // dedicated band at top for event labels above axis
 const AXIS_H    = EVT_ZONE_H; // axis line sits at bottom of event zone
 
 const C_MASOOM    = "#E8B84B";
@@ -401,7 +401,7 @@ const FAMILY = [
     arabic:"عبد المطلب بن هاشم", role:"Grandfather & Guardian of the Holy Prophet ﷺ",
     birthAH:-120, birthH:"~120 BH (c. 497 CE)", birthCE:"~497 CE",
     deathAH:-44, deathH:"~44 BH (c. 578 CE)", deathCE:"~578 CE",
-    deathType:"wafat", age:~82, shrine:"Jannat al-Mu'alla, Mecca",
+    deathType:"wafat", age:82, shrine:"Jannat al-Mu'alla, Mecca",
     detail:"Grandfather of the Holy Prophet ﷺ and chief of the Banu Hashim clan. He rediscovered the Zamzam well and was the guardian of the Kaaba. He raised the Prophet ﷺ after the passing of his parents and grandfather was the one who named him 'Muhammad.' He died when the Prophet ﷺ was about 8 years old. Shia tradition affirms he was a monotheist and was upon the religion of Ibrahim (AS).",
   },
   {
@@ -417,7 +417,7 @@ const FAMILY = [
     arabic:"أبو طالب عليه السلام", role:"Guardian & Protector of the Prophet ﷺ · Father of Imam Ali (AS)",
     birthAH:-73, birthH:"~73 BH (c. 549 CE)", birthCE:"~549 CE",
     deathAH:-3, deathH:"~3 BH, 619 CE", deathCE:"619 CE",
-    deathType:"wafat", age:~86, shrine:"Jannat al-Mu'alla, Mecca",
+    deathType:"wafat", age:86, shrine:"Jannat al-Mu'alla, Mecca",
     detail:"Uncle, guardian, and lifelong protector of the Holy Prophet ﷺ. Father of Imam Ali (AS). He shielded the Prophet ﷺ from Qurayshi persecution for decades. His passing — same year as Sayyida Khadijah (SA) — plunged the Prophet ﷺ into the Year of Sorrow. Shia scholars affirm his Islam. His support was so vital that the revelation of new hardships against Muslims was withheld during his lifetime.",
   },
   {
@@ -433,7 +433,7 @@ const FAMILY = [
     arabic:"حمزة بن عبد المطلب عليه السلام", role:"Sayyid al-Shuhada (of Uhud) · Lion of Allah",
     birthAH:-55, birthH:"~55 BH (c. 568 CE)", birthCE:"~568 CE",
     deathAH:3, deathH:"Shawwal, 3 AH — Battle of Uhud", deathCE:"625 CE",
-    deathType:"martyrdom", age:~57, shrine:"Uhud, Medina",
+    deathType:"martyrdom", age:57, shrine:"Uhud, Medina",
     detail:"Uncle of the Holy Prophet ﷺ and one of the most powerful early defenders of Islam. Known as the 'Lion of Allah' and 'Sayyid al-Shuhada' (Master of Martyrs). He was martyred at the Battle of Uhud by Wahshi ibn Harb on the order of Hind bint Utba, who mutilated his body. The Prophet ﷺ wept greatly at his martyrdom.",
   },
   {
@@ -441,7 +441,7 @@ const FAMILY = [
     arabic:"جعفر بن أبي طالب الطيار عليه السلام", role:"Ja'far al-Tayyar (The Flying One) · Martyr of Mu'ta",
     birthAH:-43, birthH:"~43 BH (c. 579 CE)", birthCE:"~579 CE",
     deathAH:8, deathH:"Jumadi al-Awwal, 8 AH — Battle of Mu'ta", deathCE:"629 CE",
-    deathType:"martyrdom", age:~33, shrine:"Mu'ta, Jordan",
+    deathType:"martyrdom", age:33, shrine:"Mu'ta, Jordan",
     detail:"Brother of Imam Ali (AS) and cousin of the Prophet ﷺ. He led the Muslims' migration to Abyssinia where his speech to the Negus won protection for the early Muslims. Commander at the Battle of Mu'ta against the Byzantine Empire where he was martyred. The Prophet ﷺ said he had two wings of light to fly in paradise — hence 'al-Tayyar.'",
   },
   {
@@ -465,7 +465,7 @@ const FAMILY = [
     arabic:"أم البنين فاطمة الكلابية سلام الله عليها", role:"Wife of Imam Ali (AS) · Mother of H. Abbas (AS)",
     birthAH:14, birthH:"~14 AH (c. 636 CE)", birthCE:"~636 CE",
     deathAH:64, deathH:"~64 AH (c. 684 CE)", deathCE:"~684 CE",
-    deathType:"wafat", age:~50, shrine:"Jannat al-Baqi, Medina",
+    deathType:"wafat", age:50, shrine:"Jannat al-Baqi, Medina",
     detail:"Second wife of Imam Ali (AS) after Sayyida Fatimah al-Zahra (AS). Mother of H. Abbas, H. Ja'far, H. Abdullah, and H. Uthman — all four of whom were martyred at Karbala. When she received news of Karbala, she cried out that all her sons were martyred and yet kept asking about Imam Husayn (AS). A model of devotion and sacrifice.",
   },
   {
@@ -481,7 +481,7 @@ const FAMILY = [
     arabic:"علي الأكبر بن الحسين عليه السلام", role:"Martyr of Karbala · Image of the Prophet ﷺ",
     birthAH:33, birthH:"11 Sha'ban, 33 AH", birthCE:"654 CE",
     deathAH:61, deathH:"10 Muharram, 61 AH", deathCE:"680 CE",
-    deathType:"martyrdom", age:~27, shrine:"Karbala, Iraq",
+    deathType:"martyrdom", age:27, shrine:"Karbala, Iraq",
     detail:"Eldest son of Imam Husayn (AS). Narrations state he most resembled the Holy Prophet ﷺ in appearance, character, and speech. First among the Bani Hashim to be martyred at Karbala. Imam Husayn's (AS) grief at his son's martyrdom — crying 'O Allah, witness that I have surrendered to You a youth who resembled Your Prophet' — is among the most heart-rending moments of Ashura.",
   },
   {
@@ -489,7 +489,7 @@ const FAMILY = [
     arabic:"القاسم بن الحسن عليه السلام", role:"Martyr of Karbala · 'Beauty of youth'",
     birthAH:47, birthH:"~47 AH (c. 667 CE)", birthCE:"~667 CE",
     deathAH:61, deathH:"10 Muharram, 61 AH", deathCE:"680 CE",
-    deathType:"martyrdom", age:~13, shrine:"Karbala, Iraq",
+    deathType:"martyrdom", age:13, shrine:"Karbala, Iraq",
     detail:"Son of Imam Hasan (AS) and nephew of Imam Husayn (AS). Martyred at Karbala at a very young age (~13–14 years). When he sought permission to fight, Imam Husayn (AS) embraced him weeping. His youth and beauty at the time of martyrdom made his loss one of the most heart-rending at Karbala.",
   },
 ];
@@ -498,35 +498,87 @@ const FAMILY = [
 //  EVENTS
 // ─────────────────────────────────────────────────────────────
 const EVENTS = [
-  { id:"mabath",  ah:-12, label:"Mab'ath ★",           hdate:"27 Rajab, 13 BH",       ce:"610 CE", color:"#F7E070", pri:3, side:"above", arabic:"المبعث النبوي الشريف",
-    detail:"The Holy Prophet ﷺ received the first Quranic revelation in Cave of Hira: 'Read in the name of your Lord who created.' Beginning of the 23-year prophetic mission." },
-  { id:"huzn",    ah:-3,  label:"Year of Sorrow",       hdate:"10 BH",                 ce:"619 CE", color:"#9B84B0", pri:2, side:"above", arabic:"عام الحزن",
-    detail:"Sayyida Khadijah (SA) and Abu Talib both passed away in the same year. The Prophet ﷺ named it 'Am al-Huzn' — Year of Sorrow." },
-  { id:"hijra",   ah:1,   label:"Hijra ✦",              hdate:"1 Muharram, 1 AH",      ce:"622 CE", color:"#7EB8C9", pri:3, side:"above", arabic:"الهجرة النبوية",
-    detail:"The Prophet ﷺ migrated from Mecca to Medina — beginning of the Hijri calendar. Imam Ali (AS) slept in the Prophet's bed to protect him the night of migration." },
-  { id:"badr",    ah:2,   label:"Badr",                 hdate:"17 Ramadan, 2 AH",      ce:"624 CE", color:"#E07B54", pri:1, side:"above", arabic:"غزوة بدر",
-    detail:"313 Muslims faced 1,000 Quraysh. Divine assistance and the valor of Imam Ali (AS) secured a decisive victory." },
-  { id:"uhud",    ah:3,   label:"Uhud",                 hdate:"Shawwal, 3 AH",         ce:"625 CE", color:"#E07B54", pri:1, side:"above", arabic:"غزوة أحد",
-    detail:"Battle near Medina. H. Hamza (AS) was martyred. The Prophet ﷺ was injured when archers abandoned their posts." },
-  { id:"muta",    ah:8,   label:"Battle of Mu'ta",      hdate:"Jumadi al-Awwal, 8 AH", ce:"629 CE", color:"#E07B54", pri:1, side:"above", arabic:"غزوة مؤتة",
-    detail:"Muslims fought the Byzantine Empire at Mu'ta (Jordan). H. Ja'far al-Tayyar (AS) was martyred as commander." },
-  { id:"fath",    ah:8.5, label:"Fath Makkah",          hdate:"20 Ramadan, 8 AH",      ce:"630 CE", color:"#F7D060", pri:2, side:"above", arabic:"فتح مكة المكرمة",
-    detail:"Near-bloodless conquest of Mecca. The Prophet ﷺ purified the Kaaba of 360 idols. Imam Ali (AS) stood on the Prophet's shoulders to remove the largest idol." },
-  { id:"ghadeer", ah:10,  label:"GHADEER KHUMM ★",      hdate:"18 Dhul Hijja, 10 AH",  ce:"632 CE", color:"#F5C518", pri:3, side:"above", arabic:"يوم الغدير الأكبر",
-    detail:"Before 120,000+ pilgrims: 'Man kuntu mawlahu fa-Aliyyun mawlahu.' Explicit divine appointment of Imam Ali (AS). Quran completed: 'Today I have perfected your religion.' (5:3)" },
-  { id:"jamal",   ah:36,  label:"Jamal",                hdate:"36 AH",                 ce:"656 CE", color:"#E07B54", pri:1, side:"above", arabic:"وقعة الجمل",
-    detail:"Battle near Basra during Imam Ali's (AS) caliphate. Imam Ali (AS) was victorious." },
-  { id:"siffin",  ah:37,  label:"Siffin",               hdate:"Safar, 37 AH",          ce:"657 CE", color:"#E07B54", pri:1, side:"above", arabic:"وقعة صفين",
-    detail:"Imam Ali (AS) vs. Muawiyah. Qurans raised on spears to force arbitration. Led to the Khawarij schism." },
-  { id:"karbala", ah:61,  label:"KARBALA ★★",           hdate:"10 Muharram, 61 AH",    ce:"680 CE", color:"#E63946", pri:3, side:"above", arabic:"عاشوراء كربلاء",
-    detail:"Imam Husayn (AS) and 72 companions martyred at Karbala. Women and children taken captive. 'Every day is Ashura, every land is Karbala.'" },
-  { id:"mukhtar", ah:66,  label:"Mukhtar's Uprising",   hdate:"66 AH",                 ce:"685 CE", color:"#7EB8C9", pri:1, side:"above", arabic:"ثورة المختار",
-    detail:"Mukhtar al-Thaqafi rose in Kufa avenging Karbala. He executed Ubaydullah ibn Ziyad, Shimr, and others responsible." },
-  { id:"sughra",  ah:260, label:"Minor Occultation",    hdate:"260 AH",                ce:"874 CE", color:"#9B7BC4", pri:2, side:"above", arabic:"الغيبة الصغرى",
-    detail:"Upon Imam al-Askari's (AS) martyrdom, the 12th Imam entered the Minor Occultation, communicating through four deputies over ~69 years." },
-  { id:"kubra",   ah:329, label:"MAJOR OCCULTATION ★",  hdate:"329 AH",                ce:"941 CE", color:"#7B5BC4", pri:3, side:"above", arabic:"الغيبة الكبرى",
-    detail:"Ali ibn Muhammad al-Samarri's death marked the beginning of the Major Occultation. The Imam is hidden until the Zuhur." },
-];
+  { id:"mabath",    ah:-12,  label:"Mab'ath ★",              hdate:"27 Rajab, 13 BH",       ce:"610 CE", color:"#F7E070", pri:3, row:0, arabic:"المبعث النبوي",
+    detail:"The Holy Prophet ﷺ received the first Quranic revelation in Cave of Hira. Beginning of the 23-year prophetic mission." },
+  { id:"huzn",      ah:-3,   label:"Year of Sorrow",          hdate:"10 BH",                 ce:"619 CE", color:"#9B84B0", pri:2, row:1, arabic:"عام الحزن",
+    detail:"Sayyida Khadijah (SA) and Abu Talib both passed in the same year. The Prophet ﷺ named it Am al-Huzn." },
+  { id:"miraj",     ah:-2,   label:"Isra wal Miraj ★",        hdate:"27 Rajab, 12 BH",       ce:"621 CE", color:"#F7E070", pri:3, row:2, arabic:"الإسراء والمعراج",
+    detail:"The Prophet ﷺ was taken from Mecca to Jerusalem then ascended through the heavens." },
+  { id:"laylat",    ah:1,    label:"Laylat al-Mabit",         hdate:"1 AH",                  ce:"622 CE", color:"#5EC48A", pri:1, row:3, arabic:"ليلة المبيت",
+    detail:"Imam Ali (AS) slept in the Prophet’s bed to enable his migration, risking his own life." },
+  { id:"hijra",     ah:1,    label:"Hijra ❖",                 hdate:"1 Muharram, 1 AH",      ce:"622 CE", color:"#7EB8C9", pri:3, row:0, arabic:"الهجرة النبوية",
+    detail:"The Prophet ﷺ migrated from Mecca to Medina, beginning of the Hijri calendar." },
+  { id:"badr",      ah:2,    label:"Badr",                    hdate:"17 Ramadan, 2 AH",      ce:"624 CE", color:"#E07B54", pri:1, row:1, arabic:"غزوة بدر",
+    detail:"313 Muslims faced 1,000 Quraysh. Divine assistance and Imam Ali’s (AS) valor secured victory." },
+  { id:"uhud",      ah:3,    label:"Uhud",                    hdate:"Shawwal, 3 AH",         ce:"625 CE", color:"#E07B54", pri:1, row:2, arabic:"غزوة أحد",
+    detail:"Battle near Medina. H. Hamza (AS) was martyred. The Prophet ﷺ was injured." },
+  { id:"khandaq",   ah:5,    label:"Khandaq",                 hdate:"5 AH",                  ce:"627 CE", color:"#E07B54", pri:1, row:3, arabic:"غزوة الخندق",
+    detail:"Salman al-Farsi’s (RA) trench strategy repelled the confederate coalition." },
+  { id:"hudayb",    ah:6,    label:"Hudaybiyyah",             hdate:"6 AH",                  ce:"628 CE", color:"#9B84B0", pri:1, row:0, arabic:"صلح الحديبية",
+    detail:"Strategic peace treaty with Quraysh enabling Muslim expansion." },
+  { id:"khaybar",   ah:7,    label:"Khaybar",                 hdate:"7 AH",                  ce:"629 CE", color:"#E07B54", pri:2, row:1, arabic:"فتح خيبر",
+    detail:"Imam Ali (AS) conquered the fortress of Khaybar, fulfilling the prophetic declaration." },
+  { id:"muta",      ah:8,    label:"Mu’ta",                   hdate:"8 AH",                  ce:"629 CE", color:"#E07B54", pri:1, row:2, arabic:"غزوة مؤتة",
+    detail:"H. Ja’far al-Tayyar (AS) was martyred commanding the Muslim forces against the Byzantines." },
+  { id:"fath",      ah:8.5,  label:"Fath Makkah",             hdate:"20 Ramadan, 8 AH",      ce:"630 CE", color:"#F7D060", pri:2, row:3, arabic:"فتح مكة",
+    detail:"Near-bloodless conquest of Mecca. The Kaaba was purified of 360 idols." },
+  { id:"hajjwada",  ah:10,   label:"Hajjat al-Wada",          hdate:"10 AH",                 ce:"632 CE", color:"#9B84B0", pri:2, row:1, arabic:"حجة الوداع",
+    detail:"The Prophet’s final pilgrimage, attended by over 100,000 believers." },
+  { id:"ghadeer",   ah:10,   label:"GHADEER ★",               hdate:"18 Dhul Hijja, 10 AH",  ce:"632 CE", color:"#F5C518", pri:3, row:0, arabic:"يوم الغدير",
+    detail:"Man kuntu mawlahu fa-Aliyyun mawlahu. Explicit appointment of Imam Ali (AS) before 120,000 pilgrims." },
+  { id:"saqifa",    ah:11,   label:"Saqifa",                  hdate:"11 AH",                 ce:"632 CE", color:"#C87878", pri:2, row:2, arabic:"سقيفة بني ساعدة",
+    detail:"The gathering at Saqifa where Abu Bakr was selected as caliph while Imam Ali (AS) prepared the Prophet’s burial." },
+  { id:"fadak",     ah:11,   label:"Fadak",                   hdate:"11 AH",                 ce:"632 CE", color:"#9B84B0", pri:2, row:3, arabic:"فدك",
+    detail:"Sayyida Fatimah Zahra (AS) delivered her famous Fadakiyya sermon demanding the return of Fadak." },
+  { id:"shura",     ah:23,   label:"Shura / Uthman",          hdate:"23 AH",                 ce:"644 CE", color:"#9B84B0", pri:1, row:0, arabic:"الشورى",
+    detail:"The six-member shura committee selected Uthman, bypassing Imam Ali (AS) a second time." },
+  { id:"uthman",    ah:35,   label:"Uthman Killed",           hdate:"35 AH",                 ce:"656 CE", color:"#C87878", pri:1, row:1, arabic:"مقتل عثمان",
+    detail:"Uthman ibn Affan was killed. Imam Ali (AS) became caliph with massive popular support." },
+  { id:"jamal",     ah:36,   label:"Jamal",                   hdate:"36 AH",                 ce:"656 CE", color:"#E07B54", pri:1, row:2, arabic:"وقعة الجمل",
+    detail:"Battle near Basra. Imam Ali (AS) was victorious against Aisha, Talha and Zubayr." },
+  { id:"siffin",    ah:37,   label:"Siffin",                  hdate:"Safar, 37 AH",          ce:"657 CE", color:"#E07B54", pri:1, row:3, arabic:"وقعة صفين",
+    detail:"Imam Ali (AS) vs. Muawiyah. Qurans raised on spears to force arbitration." },
+  { id:"nahrawan",  ah:38,   label:"Nahrawan",                hdate:"38 AH",                 ce:"658 CE", color:"#E07B54", pri:1, row:0, arabic:"معركة النهروان",
+    detail:"Imam Ali (AS) defeated the Khawarij at Nahrawan." },
+  { id:"treaty",    ah:41,   label:"Treaty of Hasan",         hdate:"41 AH",                 ce:"661 CE", color:"#9B84B0", pri:2, row:1, arabic:"صلح الإمام الحسن",
+    detail:"Imam Hasan (AS) signed a peace treaty with Muawiyah to preserve Muslim lives." },
+  { id:"hujr",      ah:51,   label:"Hujr ibn Adi",            hdate:"51 AH",                 ce:"671 CE", color:"#C87878", pri:1, row:2, arabic:"شهادة حجر بن عدي",
+    detail:"Hujr ibn Adi (RA) and companions martyred by Muawiyah for refusing to curse Imam Ali (AS)." },
+  { id:"yazid",     ah:60,   label:"Yazid Demands Bay'ah",    hdate:"60 AH",                 ce:"680 CE", color:"#C87878", pri:2, row:3, arabic:"مطالبة يزيد بالبيعة",
+    detail:"Yazid demanded allegiance from Imam Husayn (AS). The Imam refused." },
+  { id:"karbala",   ah:61,   label:"KARBALA ★★",              hdate:"10 Muharram, 61 AH",    ce:"680 CE", color:"#E63946", pri:3, row:0, arabic:"عاشوراء كربلاء",
+    detail:"Imam Husayn (AS) and 72 companions martyred at Karbala. Women and children taken captive." },
+  { id:"captives",  ah:62,   label:"Return of Captives",      hdate:"62 AH",                 ce:"681 CE", color:"#9B84B0", pri:1, row:1, arabic:"عودة السبايا",
+    detail:"Sayyida Zaynab (AS) delivered her historic sermon in Kufa and Damascus." },
+  { id:"harrah",    ah:63,   label:"Massacre of Harrah",      hdate:"63 AH",                 ce:"683 CE", color:"#C87878", pri:1, row:2, arabic:"وقعة الحرة",
+    detail:"Yazid’s forces massacred the people of Medina for three days." },
+  { id:"tawwabeen", ah:65,   label:"Tawwabeen",               hdate:"65 AH",                 ce:"684 CE", color:"#7EB8C9", pri:1, row:3, arabic:"حركة التوابين",
+    detail:"The Penitents rose seeking redemption for abandoning Imam Husayn (AS)." },
+  { id:"mukhtar",   ah:66,   label:"Mukhtar Uprising",        hdate:"66 AH",                 ce:"685 CE", color:"#7EB8C9", pri:2, row:0, arabic:"ثورة المختار",
+    detail:"Mukhtar al-Thaqafi executed those responsible for Karbala." },
+  { id:"zayd",      ah:122,  label:"Zayd ibn Ali Uprising",   hdate:"122 AH",                ce:"740 CE", color:"#7EB8C9", pri:1, row:1, arabic:"ثورة زيد بن علي",
+    detail:"Zayd ibn Ali, son of Imam Sajjad (AS), rose against the Umayyads and was martyred." },
+  { id:"yahya",     ah:125,  label:"Yahya ibn Zayd",          hdate:"125 AH",                ce:"743 CE", color:"#7EB8C9", pri:1, row:2, arabic:"استشهاد يحيى بن زيد",
+    detail:"Yahya ibn Zayd continued his father’s uprising; his death accelerated Umayyad collapse." },
+  { id:"umayyad",   ah:132,  label:"Fall of Umayyads",        hdate:"132 AH",                ce:"750 CE", color:"#F7D060", pri:2, row:3, arabic:"سقوط الدولة الأموية",
+    detail:"The Abbasid Revolution ended Umayyad rule." },
+  { id:"nafs",      ah:145,  label:"Nafs al-Zakiyya",         hdate:"145 AH",                ce:"762 CE", color:"#7EB8C9", pri:1, row:0, arabic:"ثورة النفس الزكية",
+    detail:"Muhammad ibn Abd Allah al-Nafs al-Zakiyya rose against the Abbasids and was martyred." },
+  { id:"kadhimimp", ah:179,  label:"Imam Kadhim Imprisoned",  hdate:"179 AH",                ce:"795 CE", color:"#C87878", pri:1, row:1, arabic:"سجن الإمام الكاظم",
+    detail:"Imam Kadhim (AS) was imprisoned by Harun al-Rashid and martyred in prison in 183 AH." },
+  { id:"ridhacp",   ah:201,  label:"Imam Ridha Crown Prince", hdate:"201 AH",                ce:"816 CE", color:"#9B84B0", pri:2, row:2, arabic:"ولاية عهد الإمام الرضا",
+    detail:"Al-Mamun appointed Imam Ridha (AS) as crown prince under duress." },
+  { id:"masuma",    ah:201,  label:"Sayyida Masuma in Qum",   hdate:"201 AH",                ce:"816 CE", color:"#5EC48A", pri:1, row:3, arabic:"وفاة السيدة المعصومة",
+    detail:"Sayyida Fatimah al-Masuma (SA) passed away in Qum while journeying to Khorasan." },
+  { id:"mutawakkil",ah:237,  label:"Mutawakkil Persecutes",   hdate:"237 AH",                ce:"851 CE", color:"#C87878", pri:1, row:0, arabic:"اضطهاد المتوكل",
+    detail:"Mutawakkil demolished the shrine of Imam Husayn (AS) and persecuted Shia." },
+  { id:"samarra",   ah:243,  label:"Imam Hadi to Samarra",    hdate:"243 AH",                ce:"857 CE", color:"#C87878", pri:1, row:1, arabic:"نقل الإمام الهادي",
+    detail:"Mutawakkil forced Imam Hadi (AS) to relocate to Samarra for surveillance." },
+  { id:"sughra",    ah:260,  label:"Minor Occultation",       hdate:"260 AH",                ce:"874 CE", color:"#9B7BC4", pri:2, row:2, arabic:"الغيبة الصغرى",
+    detail:"Upon Imam al-Askari’s (AS) martyrdom, the 12th Imam entered the Minor Occultation." },
+  { id:"kubra",     ah:329,  label:"MAJOR OCCULTATION ★",     hdate:"329 AH",                ce:"941 CE", color:"#7B5BC4", pri:3, row:3, arabic:"الغيبة الكبرى",
+    detail:"Ali ibn Muhammad al-Samarri’s death ended the Minor Occultation. The Imam is hidden until the Zuhur." },
+]
 
 // ─────────────────────────────────────────────────────────────
 //  MAIN COMPONENT
@@ -541,8 +593,9 @@ export default function ShiaTimeline() {
   const [sel, setSel]         = useState(null);
   const [expanded, setExpanded] = useState(new Set());
   const [filter, setFilter]   = useState("all");
-  const drag   = useRef({ active:false, x0:0, y0:0, off0:0, dir:null });
+  const drag   = useRef({ active:false, x0:0, y0:0, prevY:0, off0:0, dir:null });
   const pinch  = useRef({ active:false, d0:0, z0:1, pivot:0 });
+  const handRef = useRef({}); // always-current state snapshot for imperative handlers
 
   useEffect(()=>{
     const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
@@ -554,6 +607,8 @@ export default function ShiaTimeline() {
   const maxOff= Math.max(0, tlW - vpW);
   const clamp = useCallback(v=>Math.max(0,Math.min(v,maxOff)),[maxOff]);
   const xOf   = useCallback(ah=>((ah-MIN_AH)/SPAN)*tlW,[tlW]);
+  // Keep handRef always current so imperative listeners always read latest values
+  handRef.current = { offset, zoom, clamp, vpW };
 
   useEffect(()=>{ setOffset(o=>clamp(o)); },[zoom,clamp]);
 
@@ -567,22 +622,102 @@ export default function ShiaTimeline() {
     });
   }
 
-  // Non-passive wheel (must be added imperatively)
+  // Imperative wheel + touch listeners — registered ONCE, read current values via handRef
   useEffect(()=>{
     const el = outerRef.current;
     if(!el) return;
+
     const onWheel = e=>{
-      e.preventDefault();
+      const { clamp, vpW } = handRef.current;
       if(e.ctrlKey||e.metaKey){
-        const pivot = e.clientX - el.getBoundingClientRect().left + offset;
-        doZoom(e.deltaY<0?"in":"out", pivot-offset);
-      } else {
-        setOffset(o=>clamp(o + e.deltaX + e.deltaY*0.5));
+        // Pinch-zoom via ctrl+scroll
+        e.preventDefault();
+        const pivot = e.clientX - el.getBoundingClientRect().left;
+        setZoom(z=>{
+          const nz=e.deltaY<0?Math.min(z*1.6,14):Math.max(z/1.6,1);
+          setOffset(o=>{
+            const nMaxOff=Math.max(0,vpW*nz-vpW);
+            return Math.max(0,Math.min(nMaxOff,(o+pivot)*(nz/z)-pivot));
+          });
+          return nz;
+        });
+      } else if(Math.abs(e.deltaX) > Math.abs(e.deltaY)*0.4){
+        // Dominant horizontal scroll (trackpad swipe) — pan timeline
+        e.preventDefault();
+        setOffset(o=>clamp(o+e.deltaX));
+      }
+      // Pure vertical scroll: let browser handle page scroll naturally
+    };
+
+    const onTouchStart = e=>{
+      drag.current.active=false; pinch.current.active=false;
+      if(e.touches.length===1){
+        const t=e.touches[0];
+        drag.current={active:true,x0:t.clientX,y0:t.clientY,prevY:t.clientY,off0:handRef.current.offset,dir:null};
+      } else if(e.touches.length===2){
+        e.preventDefault();
+        const t0=e.touches[0],t1=e.touches[1];
+        const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        const midX=(t0.clientX+t1.clientX)/2-el.getBoundingClientRect().left;
+        pinch.current={active:true,d0:d,z0:handRef.current.zoom,pivot:midX,off0:handRef.current.offset};
       }
     };
-    el.addEventListener("wheel", onWheel, {passive:false});
-    return ()=>el.removeEventListener("wheel", onWheel);
-  },[zoom, offset, clamp, vpW]);
+
+    const onTouchMove = e=>{
+      if(e.touches.length===2){
+        e.preventDefault();
+        if(!pinch.current.active) return;
+        const t0=e.touches[0],t1=e.touches[1];
+        const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        const { vpW } = handRef.current;
+        const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
+        const pivot=pinch.current.pivot;
+        const nMaxOff=Math.max(0,vpW*nz-vpW);
+        setZoom(nz);
+        setOffset(Math.max(0,Math.min(nMaxOff,(pinch.current.off0+pivot)*(nz/pinch.current.z0)-pivot)));
+        return;
+      }
+      if(!drag.current.active) return;
+      const t=e.touches[0];
+      const dx=t.clientX-drag.current.x0,dy=t.clientY-drag.current.y0;
+      if(!drag.current.dir){
+        if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
+        drag.current.dir=Math.abs(dx)>=Math.abs(dy)?"h":"v";
+      }
+      if(drag.current.dir==="h"){
+        e.preventDefault();
+        setOffset(handRef.current.clamp(drag.current.off0+drag.current.x0-t.clientX));
+      } else {
+        // Vertical drag: scroll the page smoothly
+        const deltaY = drag.current.prevY - t.clientY;
+        window.scrollBy(0, deltaY);
+        drag.current.prevY = t.clientY;
+      }
+    };
+
+    const onTouchEnd = e=>{
+      if(e.touches.length===0){
+        drag.current.active=false; drag.current.dir=null; pinch.current.active=false;
+      } else if(e.touches.length===1&&pinch.current.active){
+        pinch.current.active=false;
+        const t=e.touches[0];
+        drag.current={active:true,x0:t.clientX,y0:t.clientY,prevY:t.clientY,off0:handRef.current.offset,dir:null};
+      }
+    };
+
+    el.addEventListener("wheel",      onWheel,      {passive:false});
+    el.addEventListener("touchstart",  onTouchStart, {passive:false});
+    el.addEventListener("touchmove",   onTouchMove,  {passive:false});
+    el.addEventListener("touchend",    onTouchEnd);
+    return ()=>{
+      el.removeEventListener("wheel",     onWheel);
+      el.removeEventListener("touchstart",onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend",  onTouchEnd);
+    };
+  }, []); // register once; handlers always read latest values via handRef
 
   function toggleExpand(id){
     setExpanded(prev=>{
@@ -592,37 +727,62 @@ export default function ShiaTimeline() {
     });
   }
 
-  // ── Build dynamic row list — single chronological list sorted by birthAH ──
+  // ── Build dynamic row list — lane-packed (non-overlapping items share a row) ──
   const rows = useMemo(()=>{
     const list=[];
     const compMode   = filter==="companions";
     const showMasoom = filter==="all"||filter==="masoomeen"||compMode;
     const showFamily = filter==="all"||filter==="family";
 
-    // Build primary entries (Masoomeen + Family) merged and sorted by birthAH
-    const allPrimary = [];
+    // Build separate entry lists for Masoomeen and Family
+    const masoomPrimary = [];
+    const familyPrimary = [];
     if(showMasoom){
       for(const m of MASOOMEEN){
-        allPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:(m.ashaab&&m.ashaab.length>0?MASOOM_ROW_H:ROW_H) });
+        masoomPrimary.push({ type:"masoom", data:m, color:C_MASOOM, h:(m.ashaab&&m.ashaab.length>0?MASOOM_ROW_H:ROW_H) });
       }
     }
     if(showFamily){
       for(const f of FAMILY){
-        allPrimary.push({ type:"family", data:f, color:C_FAMILY, h:ROW_H });
+        familyPrimary.push({ type:"family", data:f, color:C_FAMILY, h:ROW_H });
       }
     }
-    // Sort merged list by birthAH
-    allPrimary.sort((a,b)=>a.data.birthAH - b.data.birthAH);
+    masoomPrimary.sort((a,b)=>a.data.birthAH - b.data.birthAH);
+    familyPrimary.sort((a,b)=>a.data.birthAH - b.data.birthAH);
 
-    // Insert primary rows, and companion sub-rows immediately after their Imam
-    for(const row of allPrimary){
-      list.push(row);
-      if(row.type==="masoom"){
-        const m = row.data;
-        const showSubs = m.ashaab && m.ashaab.length>0 && (compMode || (filter==="all" && expanded.has(m.id)));
-        if(showSubs){
-          for(const a of m.ashaab){
-            list.push({ type:"companion", data:a, color:C_COMPANION, h:SUB_ROW_H, parentId:m.id });
+    // Greedy lane packing: assign items to first lane where last item ended >3 AH ago
+    function packLanes(items){
+      const lanes=[], laneEnds=[];
+      for(const item of items){
+        const startAH = item.data.birthAH;
+        const endAH   = item.data.deathAH ?? MAX_AH;
+        let found=-1;
+        for(let i=0;i<lanes.length;i++){
+          if(laneEnds[i]+3 < startAH){ found=i; break; }
+        }
+        if(found===-1){ found=lanes.length; lanes.push([]); laneEnds.push(-Infinity); }
+        lanes[found].push(item);
+        laneEnds[found]=endAH;
+      }
+      return lanes;
+    }
+
+    // Masoomeen lanes first (closest to axis = golden bars nearest timeline),
+    // then Family lanes below them
+    const allLanes = [...packLanes(masoomPrimary), ...packLanes(familyPrimary)];
+
+    // Build flat rows: one lane row per packed lane, companion sub-rows inserted after
+    for(const laneItems of allLanes){
+      const h=Math.max(...laneItems.map(item=>item.h));
+      list.push({ type:"lane", laneItems, h });
+      for(const item of laneItems){
+        if(item.type==="masoom"){
+          const m=item.data;
+          const showSubs=m.ashaab&&m.ashaab.length>0&&(compMode||(filter==="all"&&expanded.has(m.id)));
+          if(showSubs){
+            for(const a of m.ashaab){
+              list.push({ type:"companion", data:a, color:C_COMPANION, h:SUB_ROW_H, parentId:m.id });
+            }
           }
         }
       }
@@ -645,29 +805,33 @@ export default function ShiaTimeline() {
   const ticks=[];
   for(let y=Math.ceil(MIN_AH/tickStep)*tickStep;y<=MAX_AH;y+=tickStep) ticks.push(y);
 
-  // Event label visibility: pri 3 always, pri 2 at zoom>=1.5, pri 1 at zoom>=2.8
-  // Anti-overlap: suppress label if x-distance to prev visible label < MIN_GAP
-  const EVT_LABEL_GAP = 72; // min px between label centres
+  // Event label stagger: row:0-3 within EVT_ZONE_H (160px)
+  // Priority-based interval scheduling: high-priority events claim label space first,
+  // so no two labels ever overlap regardless of priority level.
   const evtLayout = (() => {
-    let evAbove=0, evBelow=0;
+    const ROW_TOP = [6, 44, 82, 120];
     const mapped = EVENTS.map(ev => {
       const visible = ev.pri===3 || (ev.pri===2 && zoom>=1.5) || zoom>=2.8;
-      const slot = ev.side==="above" ? evAbove++ : evBelow++;
-      const lv = 8 + (slot%4)*28;
-      const labelY = ev.side==="above" ? lv : baseBelow+lv;
+      const labelY = ROW_TOP[ev.row ?? 0];
       return { ...ev, labelY, _vis: visible };
     });
-    // Suppress labels that crowd each other at current zoom
-    const lastXAbove = {}, lastXBelow = {};
-    return mapped.map(ev => {
-      if(!ev._vis) return { ...ev, showLabel: false };
+    // Sort visible events: high priority first; within same priority, left-to-right
+    const visOrder = mapped.filter(e=>e._vis)
+      .sort((a,b)=> b.pri===a.pri ? a.ah-b.ah : b.pri-a.pri);
+    // Claimed label intervals per row [left_px, right_px]
+    const rowIntervals = [[],[],[],[]];
+    const showSet = new Set();
+    for(const ev of visOrder){
       const px = ((ev.ah - MIN_AH) / SPAN) * tlW;
-      const bucket = ev.side;
-      const lastX = bucket==="above" ? (lastXAbove[0]||-9999) : (lastXBelow[0]||-9999);
-      if(px - lastX < EVT_LABEL_GAP && ev.pri < 3) return { ...ev, showLabel: false };
-      if(bucket==="above") lastXAbove[0]=px; else lastXBelow[0]=px;
-      return { ...ev, showLabel: true };
-    });
+      const r  = ev.row ?? 0;
+      const lw = ev.pri===3 ? 95 : 78; // label width
+      const l=px-lw/2-5, rr=px+lw/2+5;
+      if(!rowIntervals[r].some(([a,b])=>l<b&&rr>a)){
+        showSet.add(ev.id);
+        rowIntervals[r].push([l, rr]);
+      }
+    }
+    return mapped.map(ev=>({ ...ev, showLabel: ev._vis && showSet.has(ev.id) }));
   })();
 
   const showEvents = filter==="all"||filter==="events";
@@ -682,7 +846,7 @@ export default function ShiaTimeline() {
           Masoomeen · Ahl al-Bayt · Companions (عليهم السلام)
         </h1>
         <div style={{ fontSize:9.5, color:"#566070", marginTop:3 }}>
-          100 BH – 329 AH · One unified timeline · Drag to scroll · Ctrl+Scroll or ± to zoom · Click any bar · ▶ expand companions
+          100 BH – 329 AH · One unified timeline · Drag/swipe to scroll · Pinch or Ctrl+Scroll to zoom · ± buttons to zoom · Click any bar · ▶ expand companions
         </div>
       </div>
 
@@ -741,52 +905,7 @@ export default function ShiaTimeline() {
             onMouseMove={e=>{ if(drag.current.active) setOffset(clamp(drag.current.off0+drag.current.x0-e.clientX)); }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
-            onTouchStart={e=>{
-              drag.current.active=false; pinch.current.active=false;
-              if(e.touches.length===1){
-                const t=e.touches[0];
-                drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null};
-              } else if(e.touches.length===2){
-                const t0=e.touches[0],t1=e.touches[1];
-                const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
-                const d=Math.sqrt(dx*dx+dy*dy);
-                const midX=(t0.clientX+t1.clientX)/2-e.currentTarget.getBoundingClientRect().left;
-                pinch.current={active:true,d0:d,lastD:d,z0:zoom,pivot:midX,off0:offset};
-              }
-            }}
-            onTouchMove={e=>{
-              if(e.touches.length===2){
-                e.preventDefault();
-                if(!pinch.current.active) return;
-                const t0=e.touches[0],t1=e.touches[1];
-                const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
-                const d=Math.sqrt(dx*dx+dy*dy);
-                const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
-                const pivot=pinch.current.pivot;
-                const nMaxOff=Math.max(0,vpW*nz-vpW);
-                setZoom(nz);
-                setOffset(Math.max(0,Math.min(nMaxOff,(pinch.current.off0+pivot)*(nz/pinch.current.z0)-pivot)));
-                return;
-              }
-              if(!drag.current.active) return;
-              const t=e.touches[0];
-              const dx=t.clientX-drag.current.x0,dy=t.clientY-drag.current.y0;
-              if(!drag.current.dir){
-                if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
-                drag.current.dir=Math.abs(dx)>=Math.abs(dy)?"h":"v";
-              }
-              if(drag.current.dir==="h"){ e.preventDefault(); setOffset(clamp(drag.current.off0+drag.current.x0-t.clientX)); }
-            }}
-            onTouchEnd={e=>{
-              if(e.touches.length===0){
-                drag.current.active=false; drag.current.dir=null; pinch.current.active=false;
-              } else if(e.touches.length===1&&pinch.current.active){
-                pinch.current.active=false;
-                const t=e.touches[0];
-                drag.current={active:true,x0:t.clientX,y0:t.clientY,off0:offset,dir:null};
-              }
-            }}
-            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
+            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"none", height:canvasH }}
           >
             <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>
 
@@ -801,9 +920,9 @@ export default function ShiaTimeline() {
                 const x=xOf(y),isMajor=y%100===0||y===1,isMid=y%50===0&&!isMajor;
                 return (
                   <div key={y} style={{ position:"absolute",left:x,top:AXIS_H-1 }}>
-                    <div style={{ position:"absolute",top:0,left:0,width:1,height:isMajor?14:isMid?9:5,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
+                    <div style={{ position:"absolute",bottom:0,left:0,width:1,height:isMajor?14:isMid?9:5,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
                     {(isMajor||isMid||zoom>2)&&(
-                      <div style={{ position:"absolute",top:16,left:y===1?-24:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
+                      <div style={{ position:"absolute",bottom:17,left:y===1?-24:y<0?-14:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
                         {y===1?"1 AH · Hijra ✦":ahLabel(y)}
                       </div>
                     )}
@@ -814,110 +933,112 @@ export default function ShiaTimeline() {
 
               {/* Person bars */}
               {rows.map((row,i)=>{
-                if(row.type==="sep") return null;
-                const d=row.data, top=rowYs[i];
+                const top=rowYs[i];
                 if(top==null) return null;
-                const bx=xOf(d.birthAH);
-                const endAH=d.deathAH!=null?d.deathAH:MAX_AH-4;
-                const barW=Math.max(xOf(endAH)-bx, 3);
-                const bh=row.type==="companion"?SUB_H:BAR_H;
-                const midY=top+bh/2;
-                const isComp=row.type==="companion";
-
-                // Sticky label
-                const visLeft=Math.max(0,offset-bx);
-                const stickyLeft=Math.min(Math.max(visLeft+6,6),Math.max(barW-120,6));
-
+                const itemsToRender = row.type==="lane" ? row.laneItems : [row];
                 return (
-                  <div key={d.id+"-"+i}>
-                    {/* Connector from masoom to axis */}
-                    {!isComp && (
-                      <div style={{ position:"absolute",left:bx+barW/2,top:AXIS_H,width:1,height:top-AXIS_H,background:`${row.color}15`,pointerEvents:"none" }}/>
-                    )}
-                    {/* Indent line for companion */}
-                    {isComp && (
-                      <div style={{ position:"absolute",left:bx-8,top:midY,width:8,height:1,background:`${row.color}44`,pointerEvents:"none" }}/>
-                    )}
-                    {/* Bar */}
-                    <div
-                      onClick={()=>setSel({...d,_type:"person",group:row.type,color:row.color})}
-                      title={d.label}
-                      style={{ position:"absolute",left:bx,top,width:barW,height:bh,borderRadius:bh/2,
-                        background:`linear-gradient(90deg,${row.color}15,${row.color}45 30%,${row.color}25)`,
-                        border:`1px solid ${row.color}${isComp?"40":"50"}`,
-                        cursor:"pointer",transition:"filter 0.15s",zIndex:3,
-                        opacity:isComp?0.85:1
-                      }}
-                      onMouseEnter={e=>{ e.currentTarget.style.filter="brightness(2)";e.currentTarget.style.zIndex="20"; }}
-                      onMouseLeave={e=>{ e.currentTarget.style.filter="brightness(1)";e.currentTarget.style.zIndex="3"; }}
-                    >
-                      {barW>14&&(
-                        <div style={{ position:"absolute",left:stickyLeft,top:0,bottom:0,display:"flex",alignItems:"center",gap:3,
-                          fontSize:isComp?7:zoom>2?9:8,color:`${row.color}cc`,whiteSpace:"nowrap",letterSpacing:"0.02em",transition:"left 0.04s linear"
-                        }}>
-                          {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
-                            <span onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
-                              style={{fontSize:7,color:`${row.color}ee`,cursor:"pointer",
-                                pointerEvents:"all",userSelect:"none",
-                                WebkitTapHighlightColor:"transparent",paddingRight:2}}>
-                              {expanded.has(d.id)?"▼":"▶"}
-                            </span>
+                  <React.Fragment key={`row-${i}`}>
+                    {itemsToRender.map(item=>{
+                      const d=item.data, color=item.color;
+                      const bx=xOf(d.birthAH);
+                      const endAH=d.deathAH!=null?d.deathAH:MAX_AH-4;
+                      const barW=Math.max(xOf(endAH)-bx, 3);
+                      const bh=item.type==="companion"?SUB_H:BAR_H;
+                      const midY=top+bh/2;
+                      const isComp=item.type==="companion";
+                      const visLeft=Math.max(0,offset-bx);
+                      const stickyLeft=Math.min(Math.max(visLeft+6,6),Math.max(barW-120,6));
+                      return (
+                        <div key={d.id+"-bar"}>
+                          {/* Connector from bar to axis */}
+                          {!isComp&&(
+                            <div style={{ position:"absolute",left:bx+barW/2,top:AXIS_H,width:1,height:top-AXIS_H,background:`${color}15`,pointerEvents:"none" }}/>
                           )}
-                          {zoom>1.1&&barW>50
-                            ? <>{d.imamNo?`I${d.imamNo}·`:""}{d.short}</>
-                            : <>{d.imamNo?`I${d.imamNo}`:d.id==="prophet"?"ﷺ":d.short?.slice(0,6)}</>
-                          }
+                          {/* Indent line for companion */}
+                          {isComp&&(
+                            <div style={{ position:"absolute",left:bx-8,top:midY,width:8,height:1,background:`${color}44`,pointerEvents:"none" }}/>
+                          )}
+                          {/* Bar */}
+                          <div
+                            onClick={()=>setSel({...d,_type:"person",group:item.type,color})}
+                            title={d.label}
+                            style={{ position:"absolute",left:bx,top,width:barW,height:bh,borderRadius:bh/2,
+                              background:`linear-gradient(90deg,${color}15,${color}45 30%,${color}25)`,
+                              border:`1px solid ${color}${isComp?"40":"50"}`,
+                              cursor:"pointer",transition:"filter 0.15s",zIndex:3,
+                              opacity:isComp?0.85:1,overflow:"hidden"
+                            }}
+                            onMouseEnter={e=>{ e.currentTarget.style.filter="brightness(2)";e.currentTarget.style.zIndex="20"; }}
+                            onMouseLeave={e=>{ e.currentTarget.style.filter="brightness(1)";e.currentTarget.style.zIndex="3"; }}
+                          >
+                            {barW>14&&(
+                              <div style={{ position:"absolute",left:stickyLeft,top:0,bottom:0,display:"flex",alignItems:"center",gap:3,
+                                fontSize:isComp?7:zoom>2?9:8,color:`${color}cc`,whiteSpace:"nowrap",letterSpacing:"0.02em",transition:"left 0.04s linear"
+                              }}>
+                                {item.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
+                                  <span onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
+                                    style={{fontSize:7,color:`${color}ee`,cursor:"pointer",
+                                      pointerEvents:"all",userSelect:"none",
+                                      WebkitTapHighlightColor:"transparent",paddingRight:2}}>
+                                    {expanded.has(d.id)?"▼":"▶"}
+                                  </span>
+                                )}
+                                {barW>60
+                                  ? <>{d.imamNo?`I${d.imamNo}·`:""}{d.short}</>
+                                  : <>{d.imamNo?`I${d.imamNo}`:d.short?.slice(0,6)}</>
+                                }
+                              </div>
+                            )}
+                          </div>
+                          {/* Birth dot */}
+                          <div onClick={()=>setSel({...d,_type:"person",group:item.type,color})} style={{
+                            position:"absolute",left:bx-4,top:midY-4,width:isComp?7:9,height:isComp?7:9,borderRadius:"50%",
+                            background:"#1A5C38",border:`${isComp?1:2}px solid #5EC48A`,boxShadow:`0 0 ${isComp?4:7}px #5EC48A88`,cursor:"pointer",zIndex:6
+                          }}/>
+                          {/* Death marker */}
+                          {(d.deathType==="martyrdom"||d.deathType==="wafat")&&d.deathAH!=null&&(
+                            <div onClick={()=>setSel({...d,_type:"person",group:item.type,color})} style={{
+                              position:"absolute",left:xOf(d.deathAH)-(isComp?4:5),top:midY-(isComp?4:5),
+                              width:isComp?8:10,height:isComp?8:10,transform:"rotate(45deg)",
+                              background:d.deathType==="martyrdom"?"#4A0808":"#3A2A08",
+                              border:`${isComp?1:2}px solid ${d.deathType==="martyrdom"?"#E63946":"#D4A843"}`,
+                              boxShadow:`0 0 ${isComp?5:9}px ${d.deathType==="martyrdom"?"#E6394870":"#D4A84370"}`,
+                              cursor:"pointer",zIndex:6
+                            }}/>
+                          )}
+                          {d.deathType==="occultation"&&(
+                            <div onClick={()=>setSel({...d,_type:"person",group:item.type,color})} style={{
+                              position:"absolute",left:xOf(d.birthAH)+barW-6,top:midY-6,
+                              width:12,height:12,borderRadius:"50%",background:"rgba(123,91,196,0.22)",border:"2px solid #9B7BC4",
+                              boxShadow:"0 0 10px #9B7BC480",cursor:"pointer",zIndex:6,
+                              display:"flex",alignItems:"center",justifyContent:"center",fontSize:7,color:"#9B7BC4"
+                            }}>◉</div>
+                          )}
+                          {/* Companion expand/collapse button */}
+                          {item.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
+                            <div
+                              onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
+                              style={{
+                                position:"absolute", left:bx, top:top+BAR_H+BAR_GAP,
+                                width:Math.min(barW,130), height:BTN_H,
+                                display:"flex", alignItems:"center", justifyContent:"center", gap:4,
+                                background:expanded.has(d.id)?`${color}28`:`${color}16`,
+                                borderRadius:"0 0 6px 6px",
+                                border:`1px solid ${color}${expanded.has(d.id)?"55":"30"}`,
+                                borderTop:"none",
+                                cursor:"pointer", WebkitTapHighlightColor:"transparent",
+                                userSelect:"none", zIndex:4,
+                              }}
+                            >
+                              <span style={{fontSize:7,color:`${color}${expanded.has(d.id)?"cc":"88"}`,letterSpacing:"0.05em"}}>
+                                {expanded.has(d.id)?"▲ hide companions":`▼ ${d.ashaab.length} companions`}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-
-                    {/* Birth dot */}
-                    <div onClick={()=>setSel({...d,_type:"person",group:row.type,color:row.color})} style={{
-                      position:"absolute",left:bx-4,top:midY-4,width:isComp?7:9,height:isComp?7:9,borderRadius:"50%",
-                      background:"#1A5C38",border:`${isComp?1:2}px solid #5EC48A`,boxShadow:`0 0 ${isComp?4:7}px #5EC48A88`,cursor:"pointer",zIndex:6
-                    }}/>
-
-                    {/* Death marker */}
-                    {(d.deathType==="martyrdom"||d.deathType==="wafat")&&d.deathAH!=null&&(
-                      <div onClick={()=>setSel({...d,_type:"person",group:row.type,color:row.color})} style={{
-                        position:"absolute",left:xOf(d.deathAH)-(isComp?4:5),top:midY-(isComp?4:5),
-                        width:isComp?8:10,height:isComp?8:10,transform:"rotate(45deg)",
-                        background:d.deathType==="martyrdom"?"#4A0808":"#3A2A08",
-                        border:`${isComp?1:2}px solid ${d.deathType==="martyrdom"?"#E63946":"#D4A843"}`,
-                        boxShadow:`0 0 ${isComp?5:9}px ${d.deathType==="martyrdom"?"#E6394870":"#D4A84370"}`,
-                        cursor:"pointer",zIndex:6
-                      }}/>
-                    )}
-                    {d.deathType==="occultation"&&(
-                      <div onClick={()=>setSel({...d,_type:"person",group:row.type,color:row.color})} style={{
-                        position:"absolute",left:xOf(d.birthAH)+barW-6,top:midY-6,
-                        width:12,height:12,borderRadius:"50%",background:"rgba(123,91,196,0.22)",border:"2px solid #9B7BC4",
-                        boxShadow:"0 0 10px #9B7BC480",cursor:"pointer",zIndex:6,
-                        display:"flex",alignItems:"center",justifyContent:"center",fontSize:7,color:"#9B7BC4"
-                      }}>◉</div>
-                    )}
-                    {/* Companion expand/collapse button */}
-                    {row.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&(filter==="all"||filter==="companions")&&(
-                      <div
-                        onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
-                        style={{
-                          position:"absolute", left:bx, top:top+BAR_H+BAR_GAP,
-                          width:Math.min(barW,130), height:BTN_H,
-                          display:"flex", alignItems:"center", justifyContent:"center", gap:4,
-                          background:expanded.has(d.id)?`${row.color}28`:`${row.color}16`,
-                          borderRadius:"0 0 6px 6px",
-                          border:`1px solid ${row.color}${expanded.has(d.id)?"55":"30"}`,
-                          borderTop:"none",
-                          cursor:"pointer", WebkitTapHighlightColor:"transparent",
-                          userSelect:"none", zIndex:4,
-                        }}
-                      >
-                        <span style={{fontSize:7,color:`${row.color}${expanded.has(d.id)?"cc":"88"}`,letterSpacing:"0.05em"}}>
-                          {expanded.has(d.id)?"▲ hide companions":`▼ ${d.ashaab.length} companions`}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                      );
+                    })}
+                  </React.Fragment>
                 );
               })}
 
@@ -929,7 +1050,7 @@ export default function ShiaTimeline() {
                 return (
                   <div key={ev.id}>
                     {isHigh&&<div style={{ position:"absolute",left:ex,top:0,bottom:0,width:1,background:`${ev.color}18`,pointerEvents:"none" }}/>}
-                    {showLabel&&<div style={{ position:"absolute",left:ex,top:ev.side==="above"?ev.labelY+14:AXIS_H+6,width:1,height:ev.side==="above"?Math.max(0,dotY-(ev.labelY+14)):Math.max(0,ev.labelY-(AXIS_H+6)),background:`${ev.color}35`,pointerEvents:"none" }}/>}
+                    {showLabel&&<div style={{ position:"absolute",left:ex,top:ev.labelY+13,width:1,height:Math.max(0,dotY-(ev.labelY+13)),background:`${ev.color}35`,pointerEvents:"none" }}/>}
                     <div onClick={()=>setSel({...ev,_type:"event"})}
                       style={{ position:"absolute",left:ex-4,top:dotY,width:9,height:9,borderRadius:"50%",background:ev.color,border:`1px solid ${ev.color}`,boxShadow:`0 0 ${isHigh?13:6}px ${ev.color}99`,cursor:"pointer",zIndex:8,transition:"transform 0.15s" }}
                       onMouseEnter={e=>e.currentTarget.style.transform="scale(1.7)"}
@@ -962,7 +1083,7 @@ export default function ShiaTimeline() {
 
       {/* Stats */}
       <div style={{ display:"flex",justifyContent:"center",gap:18,padding:"4px 16px 12px",flexWrap:"wrap" }}>
-        {[["14","Masoomeen (AS)"],["12","Family Personalities"],["52","Companions & Deputies"],["14","Major Events"]].map(([n,l])=>(
+        {[["14","Masoomeen (AS)"],["12","Family Personalities"],["52","Companions & Deputies"],["40","Historical Events"]].map(([n,l])=>(
           <div key={l} style={{ textAlign:"center" }}>
             <div style={{ fontSize:15,color:"#F5C842" }}>{n}</div>
             <div style={{ fontSize:8,color:"#6A7C8A",textTransform:"uppercase",letterSpacing:"0.07em" }}>{l}</div>
@@ -993,7 +1114,7 @@ export default function ShiaTimeline() {
                 {(sel.birthH||sel.birthAH!=null)&&<div style={{ padding:"5px 10px",background:"rgba(94,196,138,0.09)",border:"1px solid rgba(94,196,138,0.22)",borderRadius:8,fontSize:11 }}>
                   <div style={{ color:"#5EC48A",fontSize:8,marginBottom:2 }}>BIRTH</div>
                   <span style={{ color:"#D8CCBA" }}>{sel.birthH||ahLabel(sel.birthAH)}</span>
-                  {sel.birthCE&&<span style={{ color:"#5A6A78",marginLeft:6 }}>{sel.birthCE}</span>}
+                  {sel.birthCE&&!sel.birthH?.includes("CE")&&<span style={{ color:"#5A6A78",marginLeft:6 }}>{sel.birthCE}</span>}
                 </div>}
                 {(sel.deathH||sel.deathAH!=null)&&sel.deathType!=="occultation"&&<div style={{ padding:"5px 10px",background:`rgba(${sel.deathType==="martyrdom"?"230,57,70":"212,168,67"},0.09)`,border:`1px solid rgba(${sel.deathType==="martyrdom"?"230,57,70":"212,168,67"},0.22)`,borderRadius:8,fontSize:11 }}>
                   <div style={{ color:sel.deathType==="martyrdom"?"#E63946":"#D4A843",fontSize:8,marginBottom:2 }}>

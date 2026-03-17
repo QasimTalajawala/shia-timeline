@@ -141,7 +141,7 @@ const MASOOMEEN = [
         role:"Ambassador of Imam Husayn (AS) to Kufa",
         birthAH:18, deathAH:60, deathType:"martyrdom", shrine:"Kufa, Iraq",
         detail:"Cousin of Imam Husayn (AS) and his first emissary to Kufa. 18,000 Kufans pledged allegiance through him. When Ibn Ziyad arrived, the people abandoned him. Betrayed, captured, and martyred on 9 Dhul Hijja 60 AH — one month before Karbala." },
-      { id:"hurr", short:"Hurr ibn Yazid al-Riyahi (RA)", label:"Hurr ibn Yazid al-Riyahi", arabic:"الحر بن يزيد الرياحي",
+      { id:"hurr", short:"Hurr ibn Yazid al-Riyahi (RA)", label:"Hurr ibn Yazid al-Riyahi (RA)", arabic:"الحر بن يزيد الرياحي",
         role:"The Redeemed Commander — from oppressor to martyr",
         birthAH:20, deathAH:61, deathType:"martyrdom", shrine:"Karbala, Iraq",
         detail:"Commander in the Umayyad army sent to intercept Imam Husayn (AS). On the morning of Ashura, his conscience overcame him. He rode to Imam Husayn (AS), confessed, and asked forgiveness. The Imam accepted him. He was among the first martyred — his repentance is one of the most powerful moments of Karbala." },
@@ -399,7 +399,7 @@ const FAMILY = [
   {
     id:"abdulmuttalib", short:"H. Abd al-Muttalib (SA)", label:"Abd al-Muttalib ibn Hashim",
     arabic:"عبد المطلب بن هاشم", role:"Grandfather & Guardian of the Holy Prophet ﷺ",
-    birthAH:-120, birthH:"~120 BH (c. 497 CE)", birthCE:"~497 CE",
+    birthAH:-126, birthH:"~126 BH (c. 496 CE)", birthCE:"~496 CE",
     deathAH:-44, deathH:"~44 BH (c. 578 CE)", deathCE:"~578 CE",
     deathType:"wafat", age:82, shrine:"Jannat al-Mu'alla, Mecca",
     detail:"Grandfather of the Holy Prophet ﷺ and chief of the Banu Hashim clan. He rediscovered the Zamzam well and was the guardian of the Kaaba. He raised the Prophet ﷺ after the passing of his parents and grandfather was the one who named him 'Muhammad.' He died when the Prophet ﷺ was about 8 years old. Shia tradition affirms he was a monotheist and was upon the religion of Ibrahim (AS).",
@@ -415,7 +415,7 @@ const FAMILY = [
   {
     id:"abutalib", short:"H. Abu Talib (SA)", label:"Abu Talib ibn Abd al-Muttalib",
     arabic:"أبو طالب عليه السلام", role:"Guardian & Protector of the Prophet ﷺ · Father of Imam Ali (AS)",
-    birthAH:-73, birthH:"~73 BH (c. 549 CE)", birthCE:"~549 CE",
+    birthAH:-89, birthH:"~89 BH (c. 533 CE)", birthCE:"~533 CE",
     deathAH:-3, deathH:"~3 BH, 619 CE", deathCE:"619 CE",
     deathType:"wafat", age:86, shrine:"Jannat al-Mu'alla, Mecca",
     detail:"Uncle, guardian, and lifelong protector of the Holy Prophet ﷺ. Father of Imam Ali (AS). He shielded the Prophet ﷺ from Qurayshi persecution for decades. His passing — same year as Sayyida Khadijah (SA) — plunged the Prophet ﷺ into the Year of Sorrow. Shia scholars affirm his Islam. His support was so vital that the revelation of new hardships against Muslims was withheld during his lifetime.",
@@ -439,9 +439,9 @@ const FAMILY = [
   {
     id:"jafar_tayyar", short:"H. Ja'far al-Tayyar (SA)", label:"Ja'far ibn Abi Talib — Ja'far al-Tayyar (AS)",
     arabic:"جعفر بن أبي طالب الطيار عليه السلام", role:"Ja'far al-Tayyar (The Flying One) · Martyr of Mu'ta",
-    birthAH:-43, birthH:"~43 BH (c. 579 CE)", birthCE:"~579 CE",
+    birthAH:-33, birthH:"~33 BH (c. 589 CE)", birthCE:"~589 CE",
     deathAH:8, deathH:"Jumadi al-Awwal, 8 AH — Battle of Mu'ta", deathCE:"629 CE",
-    deathType:"martyrdom", age:33, shrine:"Mu'ta, Jordan",
+    deathType:"martyrdom", age:41, shrine:"Mu'ta, Jordan",
     detail:"Brother of Imam Ali (AS) and cousin of the Prophet ﷺ. He led the Muslims' migration to Abyssinia where his speech to the Negus won protection for the early Muslims. Commander at the Battle of Mu'ta against the Byzantine Empire where he was martyred. The Prophet ﷺ said he had two wings of light to fly in paradise — hence 'al-Tayyar.'",
   },
   {
@@ -500,9 +500,9 @@ const FAMILY = [
 const EVENTS = [
   { id:"mabath",    ah:-12,  label:"Mab'ath ★",              hdate:"27 Rajab, 13 BH",       ce:"610 CE", color:"#F7E070", pri:3, row:0, arabic:"المبعث النبوي",
     detail:"The Holy Prophet ﷺ received the first Quranic revelation in Cave of Hira. Beginning of the 23-year prophetic mission." },
-  { id:"huzn",      ah:-3,   label:"Year of Sorrow",          hdate:"10 BH",                 ce:"619 CE", color:"#9B84B0", pri:2, row:1, arabic:"عام الحزن",
+  { id:"huzn",      ah:-3,   label:"Year of Sorrow",          hdate:"3 BH",                  ce:"619 CE", color:"#9B84B0", pri:2, row:1, arabic:"عام الحزن",
     detail:"Sayyida Khadijah (SA) and Abu Talib both passed in the same year. The Prophet ﷺ named it Am al-Huzn." },
-  { id:"miraj",     ah:-2,   label:"Isra wal Miraj ★",        hdate:"27 Rajab, 12 BH",       ce:"621 CE", color:"#F7E070", pri:3, row:2, arabic:"الإسراء والمعراج",
+  { id:"miraj",     ah:-1,   label:"Isra wal Miraj ★",        hdate:"27 Rajab, 1 BH",        ce:"621 CE", color:"#F7E070", pri:3, row:2, arabic:"الإسراء والمعراج",
     detail:"The Prophet ﷺ was taken from Mecca to Jerusalem then ascended through the heavens." },
   { id:"laylat",    ah:1,    label:"Laylat al-Mabit",         hdate:"1 AH",                  ce:"622 CE", color:"#5EC48A", pri:1, row:3, arabic:"ليلة المبيت",
     detail:"Imam Ali (AS) slept in the Prophet’s bed to enable his migration, risking his own life." },

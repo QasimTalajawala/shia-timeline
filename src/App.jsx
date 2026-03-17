@@ -506,7 +506,7 @@ const EVENTS = [
     detail:"The Prophet ﷺ was taken from Mecca to Jerusalem then ascended through the heavens." },
   { id:"laylat",    ah:1,    label:"Laylat al-Mabit",         hdate:"1 AH",                  ce:"622 CE", color:"#5EC48A", pri:1, row:3, arabic:"ليلة المبيت",
     detail:"Imam Ali (AS) slept in the Prophet’s bed to enable his migration, risking his own life." },
-  { id:"hijra",     ah:1,    label:"Hijra ❖",                 hdate:"1 Muharram, 1 AH",      ce:"622 CE", color:"#7EB8C9", pri:3, row:0, arabic:"الهجرة النبوية",
+  { id:"hijra",     ah:1,    label:"Hijra ❖",                 hdate:"1 Muharram, 1 AH",      ce:"622 CE", color:"#7EB8C9", pri:3, row:1, arabic:"الهجرة النبوية",
     detail:"The Prophet ﷺ migrated from Mecca to Medina, beginning of the Hijri calendar." },
   { id:"badr",      ah:2,    label:"Badr",                    hdate:"17 Ramadan, 2 AH",      ce:"624 CE", color:"#E07B54", pri:1, row:1, arabic:"غزوة بدر",
     detail:"313 Muslims faced 1,000 Quraysh. Divine assistance and Imam Ali’s (AS) valor secured victory." },
@@ -524,7 +524,7 @@ const EVENTS = [
     detail:"Near-bloodless conquest of Mecca. The Kaaba was purified of 360 idols." },
   { id:"hajjwada",  ah:10,   label:"Hajjat al-Wada",          hdate:"10 AH",                 ce:"632 CE", color:"#9B84B0", pri:2, row:1, arabic:"حجة الوداع",
     detail:"The Prophet’s final pilgrimage, attended by over 100,000 believers." },
-  { id:"ghadeer",   ah:10,   label:"GHADEER ★",               hdate:"18 Dhul Hijja, 10 AH",  ce:"632 CE", color:"#F5C518", pri:3, row:0, arabic:"يوم الغدير",
+  { id:"ghadeer",   ah:10,   label:"GHADEER ★",               hdate:"18 Dhul Hijja, 10 AH",  ce:"632 CE", color:"#F5C518", pri:3, row:3, arabic:"يوم الغدير",
     detail:"Man kuntu mawlahu fa-Aliyyun mawlahu. Explicit appointment of Imam Ali (AS) before 120,000 pilgrims." },
   { id:"saqifa",    ah:11,   label:"Saqifa",                  hdate:"11 AH",                 ce:"632 CE", color:"#C87878", pri:2, row:2, arabic:"سقيفة بني ساعدة",
     detail:"The gathering at Saqifa where Abu Bakr was selected as caliph while Imam Ali (AS) prepared the Prophet’s burial." },
@@ -792,7 +792,7 @@ export default function ShiaTimeline() {
 
   // Compute y positions
   const rowYs = useMemo(()=>{
-    const ys=[]; let y=AXIS_H+6;
+    const ys=[]; let y=AXIS_H+24; // extra gap for tick labels that now sit below the axis
     for(const r of rows){ ys.push(y); y+=r.h; }
     return ys;
   },[rows]);
@@ -922,7 +922,8 @@ export default function ShiaTimeline() {
                   <div key={y} style={{ position:"absolute",left:x,top:AXIS_H-1 }}>
                     <div style={{ position:"absolute",bottom:0,left:0,width:1,height:isMajor?14:isMid?9:5,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
                     {(isMajor||isMid||zoom>2)&&(
-                      <div style={{ position:"absolute",bottom:17,left:y===1?-24:y<0?-14:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
+                      /* Tick labels sit BELOW the axis so they never overlap event labels above */
+                      <div style={{ position:"absolute",top:4,left:y===1?-26:y<0?-14:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
                         {y===1?"1 AH · Hijra ✦":ahLabel(y)}
                       </div>
                     )}
@@ -950,9 +951,9 @@ export default function ShiaTimeline() {
                       const stickyLeft=Math.min(Math.max(visLeft+6,6),Math.max(barW-120,6));
                       return (
                         <div key={d.id+"-bar"}>
-                          {/* Connector from bar to axis */}
-                          {!isComp&&(
-                            <div style={{ position:"absolute",left:bx+barW/2,top:AXIS_H,width:1,height:top-AXIS_H,background:`${color}15`,pointerEvents:"none" }}/>
+                          {/* Thin connector from bar up to the axis — only for rows below the first */}
+                          {!isComp&&top>(AXIS_H+24)&&(
+                            <div style={{ position:"absolute",left:bx+barW/2,top:AXIS_H+24,width:1,height:top-(AXIS_H+24),background:`${color}12`,pointerEvents:"none" }}/>
                           )}
                           {/* Indent line for companion */}
                           {isComp&&(
@@ -1064,7 +1065,7 @@ export default function ShiaTimeline() {
                         fontWeight:isHigh?700:400,zIndex:7,letterSpacing:"0.02em"
                       }}>
                         {ev.label}
-                        {zoom>1.7&&<div style={{ fontSize:7,color:`${ev.color}66`,marginTop:1 }}>{ev.hdate}</div>}
+                        {zoom>=2.5&&<div style={{ fontSize:7,color:`${ev.color}66`,marginTop:1 }}>{ev.hdate}</div>}
                       </div>
                     )}
                   </div>

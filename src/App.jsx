@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useRef, useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 
 // ─────────────────────────────────────────────────────────────
 //  CONSTANTS
@@ -597,6 +597,7 @@ export default function ShiaTimeline() {
   const pinch  = useRef({ active:false, d0:0, z0:1, pivot:0 });
   const handRef = useRef({}); // always-current state snapshot for imperative handlers
   const vel    = useRef({ vx:0, t:0, x:0, raf:null }); // momentum tracking
+  const pendingScrollRef = useRef(null); // desired scrollLeft to apply after zoom re-render
 
   useEffect(()=>{
     const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
@@ -611,110 +612,107 @@ export default function ShiaTimeline() {
   // Keep handRef always current so imperative listeners always read latest values
   handRef.current = { offset, zoom, clamp, vpW };
 
-  useEffect(()=>{ setOffset(o=>clamp(o)); },[zoom,clamp]);
+  // After zoom renders (new tlW), apply the pending scroll position
+  useLayoutEffect(()=>{
+    if(pendingScrollRef.current!==null && outerRef.current){
+      const sl=pendingScrollRef.current;
+      outerRef.current.scrollLeft=sl;
+      setOffset(sl);
+      pendingScrollRef.current=null;
+    }
+  },[zoom]);
 
-  // Zoom buttons and trackpad
+  // Zoom buttons
   function doZoom(dir, pivot){
     const p = pivot ?? vpW/2;
+    const currSL = outerRef.current ? outerRef.current.scrollLeft : offset;
     setZoom(z=>{
       const nz = dir==="in" ? Math.min(z*1.6,14) : Math.max(z/1.6,1);
-      setOffset(o=>clamp((o+p)*(nz/z)-p));
+      const nMaxOff=Math.max(0,vpW*nz-vpW);
+      pendingScrollRef.current=Math.max(0,Math.min(nMaxOff,(currSL+p)*(nz/z)-p));
       return nz;
     });
   }
 
   // Imperative wheel + touch listeners — registered ONCE, read current values via handRef
+  // Horizontal panning sets el.scrollLeft directly (no React re-renders during gesture).
+  // onScroll on the outer div keeps offset state in sync for rendering (evtLayout, labels).
+  // Vertical scroll: touchAction:"pan-y" lets the browser handle it natively.
   useEffect(()=>{
     const el = outerRef.current;
     if(!el) return;
 
     const onWheel = e=>{
-      const { clamp, vpW } = handRef.current;
+      const { zoom:z, vpW:w } = handRef.current;
       if(e.ctrlKey||e.metaKey){
-        // Pinch-zoom via ctrl+scroll
         e.preventDefault();
         const pivot = e.clientX - el.getBoundingClientRect().left;
-        setZoom(z=>{
-          const nz=e.deltaY<0?Math.min(z*1.6,14):Math.max(z/1.6,1);
-          setOffset(o=>{
-            const nMaxOff=Math.max(0,vpW*nz-vpW);
-            return Math.max(0,Math.min(nMaxOff,(o+pivot)*(nz/z)-pivot));
-          });
-          return nz;
-        });
-      } else if(Math.abs(e.deltaX) > Math.abs(e.deltaY)*0.4){
-        // Dominant horizontal scroll (trackpad swipe) — pan timeline
+        const nz=e.deltaY<0?Math.min(z*1.6,14):Math.max(z/1.6,1);
+        const nMaxOff=Math.max(0,w*nz-w);
+        pendingScrollRef.current=Math.max(0,Math.min(nMaxOff,(el.scrollLeft+pivot)*(nz/z)-pivot));
+        setZoom(nz);
+      } else if(Math.abs(e.deltaX)>Math.abs(e.deltaY)*0.4){
         e.preventDefault();
-        setOffset(o=>clamp(o+e.deltaX));
+        el.scrollLeft+=e.deltaX;
       }
-      // Pure vertical scroll: let browser handle page scroll naturally
     };
 
     const onTouchStart = e=>{
-      // Cancel any in-flight momentum
       cancelAnimationFrame(vel.current.raf); vel.current.vx=0;
       drag.current.active=false; pinch.current.active=false;
       if(e.touches.length===1){
         const t=e.touches[0];
         vel.current.x=t.clientX; vel.current.t=Date.now();
-        drag.current={active:true,x0:t.clientX,y0:t.clientY,prevY:t.clientY,off0:handRef.current.offset,dir:null};
-      } else if(e.touches.length===2){
+        drag.current={active:true,x0:t.clientX,y0:t.clientY,sl0:el.scrollLeft,dir:null};
+      } else if(e.touches.length>=2){
         e.preventDefault();
         const t0=e.touches[0],t1=e.touches[1];
         const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
         const d=Math.sqrt(dx*dx+dy*dy);
         const midX=(t0.clientX+t1.clientX)/2-el.getBoundingClientRect().left;
-        pinch.current={active:true,d0:d,z0:handRef.current.zoom,pivot:midX,off0:handRef.current.offset};
+        pinch.current={active:true,d0:d,z0:handRef.current.zoom,pivot:midX,sl0:el.scrollLeft};
       }
     };
 
     const onTouchMove = e=>{
-      if(e.touches.length===2){
+      if(e.touches.length>=2&&pinch.current.active){
         e.preventDefault();
-        if(!pinch.current.active) return;
         const t0=e.touches[0],t1=e.touches[1];
         const dx=t0.clientX-t1.clientX,dy=t0.clientY-t1.clientY;
         const d=Math.sqrt(dx*dx+dy*dy);
-        const { vpW } = handRef.current;
+        const {vpW:w}=handRef.current;
         const nz=Math.max(1,Math.min(14,pinch.current.z0*(d/pinch.current.d0)));
         const pivot=pinch.current.pivot;
-        const nMaxOff=Math.max(0,vpW*nz-vpW);
+        const nMaxOff=Math.max(0,w*nz-w);
+        pendingScrollRef.current=Math.max(0,Math.min(nMaxOff,(pinch.current.sl0+pivot)*(nz/pinch.current.z0)-pivot));
         setZoom(nz);
-        setOffset(Math.max(0,Math.min(nMaxOff,(pinch.current.off0+pivot)*(nz/pinch.current.z0)-pivot)));
         return;
       }
-      if(!drag.current.active) return;
+      if(!drag.current.active||e.touches.length!==1) return;
       const t=e.touches[0];
-      const dx=t.clientX-drag.current.x0,dy=t.clientY-drag.current.y0;
+      const dx=t.clientX-drag.current.x0, dy=t.clientY-drag.current.y0;
       if(!drag.current.dir){
-        // Larger dead zone + require clearly horizontal (1.5×) to avoid accidental pan
         if(Math.abs(dx)<10&&Math.abs(dy)<10) return;
         drag.current.dir=Math.abs(dx)>Math.abs(dy)*1.5?"h":"v";
       }
       if(drag.current.dir==="h"){
         e.preventDefault();
-        // Track velocity for momentum
         const now=Date.now(); const dt=Math.max(1,now-vel.current.t);
         vel.current.vx=(vel.current.x-t.clientX)/dt*14;
         vel.current.x=t.clientX; vel.current.t=now;
-        setOffset(handRef.current.clamp(drag.current.off0+drag.current.x0-t.clientX));
-      } else {
-        // Vertical drag: scroll the page smoothly
-        const deltaY = drag.current.prevY - t.clientY;
-        window.scrollBy(0, deltaY);
-        drag.current.prevY = t.clientY;
+        // Direct DOM — no React setState, no re-render during gesture
+        el.scrollLeft=drag.current.sl0+drag.current.x0-t.clientX;
       }
+      // vertical: touchAction:"pan-y" handles natively — no window.scrollBy needed
     };
 
     const onTouchEnd = e=>{
       if(e.touches.length===0){
-        // Launch momentum if horizontal drag was fast enough
         if(drag.current.dir==="h"){
           let vx=vel.current.vx;
           const decay=()=>{
-            if(Math.abs(vx)<0.3){ vel.current.raf=null; return; }
-            setOffset(o=>handRef.current.clamp(o+vx));
-            vx*=0.88;
+            if(Math.abs(vx)<0.5){vel.current.raf=null;return;}
+            el.scrollLeft+=vx; vx*=0.88;
             vel.current.raf=requestAnimationFrame(decay);
           };
           vel.current.raf=requestAnimationFrame(decay);
@@ -723,7 +721,8 @@ export default function ShiaTimeline() {
       } else if(e.touches.length===1&&pinch.current.active){
         pinch.current.active=false;
         const t=e.touches[0];
-        drag.current={active:true,x0:t.clientX,y0:t.clientY,prevY:t.clientY,off0:handRef.current.offset,dir:null};
+        vel.current.x=t.clientX; vel.current.t=Date.now();
+        drag.current={active:true,x0:t.clientX,y0:t.clientY,sl0:el.scrollLeft,dir:null};
       }
     };
 
@@ -921,13 +920,15 @@ export default function ShiaTimeline() {
         <div ref={vpRef} style={{ flex:1, minWidth:0 }}>
           <div
             ref={outerRef}
-            onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,off0:offset,dir:null}; }}
-            onMouseMove={e=>{ if(drag.current.active) setOffset(clamp(drag.current.off0+drag.current.x0-e.clientX)); }}
+            className="tl-canvas"
+            onScroll={e=>setOffset(Math.round(e.currentTarget.scrollLeft))}
+            onMouseDown={e=>{ drag.current={active:true,x0:e.clientX,sl0:outerRef.current.scrollLeft}; }}
+            onMouseMove={e=>{ if(drag.current.active&&outerRef.current) outerRef.current.scrollLeft=drag.current.sl0+drag.current.x0-e.clientX; }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
-            style={{ overflow:"hidden", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"none", height:canvasH }}
+            style={{ overflowX:"scroll", overflowY:"hidden", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
           >
-            <div style={{ width:tlW, height:canvasH, transform:`translateX(${-offset}px)`, position:"relative" }}>
+            <div style={{ width:tlW, height:canvasH, position:"relative" }}>
 
               {/* Reference lines */}
               {[{ah:1,c:"rgba(126,184,201,0.08)"},{ah:61,c:"rgba(230,57,70,0.09)"},{ah:10,c:"rgba(245,197,24,0.06)"}].map(({ah,c})=>(

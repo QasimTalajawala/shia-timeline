@@ -697,8 +697,8 @@ export default function ShiaTimeline() {
       const t=e.touches[0];
       const dx=t.clientX-drag.current.x0, dy=t.clientY-drag.current.y0;
       if(!drag.current.dir){
-        if(Math.abs(dx)<10&&Math.abs(dy)<10) return;
-        drag.current.dir=Math.abs(dx)>Math.abs(dy)*1.5?"h":"v";
+        if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
+        drag.current.dir=Math.abs(dx)>Math.abs(dy)*1.2?"h":"v";
       }
       if(drag.current.dir==="h"){
         e.preventDefault();
@@ -707,8 +707,12 @@ export default function ShiaTimeline() {
         vel.current.x=t.clientX; vel.current.t=now;
         // Direct DOM — no React setState, no re-render during gesture
         el.scrollLeft=drag.current.sl0+drag.current.x0-t.clientX;
+      } else if(drag.current.dir==="v"){
+        // touchAction:"none" means we must scroll the page manually
+        const deltaY=drag.current.y0-t.clientY;
+        drag.current.y0=t.clientY; // track per-frame delta, not total
+        window.scrollBy(0,deltaY);
       }
-      // vertical: touchAction:"pan-y" handles natively — no window.scrollBy needed
     };
 
     const onTouchEnd = e=>{
@@ -931,7 +935,7 @@ export default function ShiaTimeline() {
             onMouseMove={e=>{ if(drag.current.active&&outerRef.current) outerRef.current.scrollLeft=drag.current.sl0+drag.current.x0-e.clientX; }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
-            style={{ overflowX:"scroll", overflowY:"hidden", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH, width:vpW, maxWidth:"100%" }}
+            style={{ overflowX:"scroll", overflowY:"hidden", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"none", height:canvasH, width:vpW, maxWidth:"100%" }}
           >
             <div style={{ width:tlW, height:canvasH, position:"relative" }}>
 

@@ -596,6 +596,7 @@ export default function ShiaTimeline() {
   const drag   = useRef({ active:false, x0:0, y0:0, prevY:0, off0:0, dir:null });
   const pinch  = useRef({ active:false, d0:0, z0:1, pivot:0 });
   const handRef = useRef({}); // always-current state snapshot for imperative handlers
+  const vel    = useRef({ vx:0, t:0, x:0, raf:null }); // momentum tracking
 
   useEffect(()=>{
     const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
@@ -650,9 +651,12 @@ export default function ShiaTimeline() {
     };
 
     const onTouchStart = e=>{
+      // Cancel any in-flight momentum
+      cancelAnimationFrame(vel.current.raf); vel.current.vx=0;
       drag.current.active=false; pinch.current.active=false;
       if(e.touches.length===1){
         const t=e.touches[0];
+        vel.current.x=t.clientX; vel.current.t=Date.now();
         drag.current={active:true,x0:t.clientX,y0:t.clientY,prevY:t.clientY,off0:handRef.current.offset,dir:null};
       } else if(e.touches.length===2){
         e.preventDefault();
@@ -683,11 +687,16 @@ export default function ShiaTimeline() {
       const t=e.touches[0];
       const dx=t.clientX-drag.current.x0,dy=t.clientY-drag.current.y0;
       if(!drag.current.dir){
-        if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
-        drag.current.dir=Math.abs(dx)>=Math.abs(dy)?"h":"v";
+        // Larger dead zone + require clearly horizontal (1.5×) to avoid accidental pan
+        if(Math.abs(dx)<10&&Math.abs(dy)<10) return;
+        drag.current.dir=Math.abs(dx)>Math.abs(dy)*1.5?"h":"v";
       }
       if(drag.current.dir==="h"){
         e.preventDefault();
+        // Track velocity for momentum
+        const now=Date.now(); const dt=Math.max(1,now-vel.current.t);
+        vel.current.vx=(vel.current.x-t.clientX)/dt*14;
+        vel.current.x=t.clientX; vel.current.t=now;
         setOffset(handRef.current.clamp(drag.current.off0+drag.current.x0-t.clientX));
       } else {
         // Vertical drag: scroll the page smoothly
@@ -699,6 +708,17 @@ export default function ShiaTimeline() {
 
     const onTouchEnd = e=>{
       if(e.touches.length===0){
+        // Launch momentum if horizontal drag was fast enough
+        if(drag.current.dir==="h"){
+          let vx=vel.current.vx;
+          const decay=()=>{
+            if(Math.abs(vx)<0.3){ vel.current.raf=null; return; }
+            setOffset(o=>handRef.current.clamp(o+vx));
+            vx*=0.88;
+            vel.current.raf=requestAnimationFrame(decay);
+          };
+          vel.current.raf=requestAnimationFrame(decay);
+        }
         drag.current.active=false; drag.current.dir=null; pinch.current.active=false;
       } else if(e.touches.length===1&&pinch.current.active){
         pinch.current.active=false;

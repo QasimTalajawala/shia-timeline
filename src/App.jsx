@@ -869,11 +869,11 @@ export default function ShiaTimeline() {
 
       {/* Header */}
       <div style={{ textAlign:"center", padding:"16px 16px 6px" }}>
-        <div style={{ color:"#A07830", fontSize:9, letterSpacing:"0.45em", textTransform:"uppercase", marginBottom:4 }}>٭  A Sacred Chronology  ٭</div>
-        <h1 style={{ margin:0, fontWeight:400, fontSize:"clamp(14px,2.2vw,26px)", color:"#F5C842", letterSpacing:"0.06em", textShadow:"0 0 50px rgba(245,200,66,0.3)" }}>
+        <div style={{ color:"#B08840", fontSize:11, letterSpacing:"0.45em", textTransform:"uppercase", marginBottom:4 }}>٭  A Sacred Chronology  ٭</div>
+        <h1 style={{ margin:0, fontWeight:400, fontSize:"clamp(16px,2.5vw,28px)", color:"#F5C842", letterSpacing:"0.06em", textShadow:"0 0 50px rgba(245,200,66,0.3)" }}>
           Masoomeen · Ahl al-Bayt · Companions (عليهم السلام)
         </h1>
-        <div style={{ fontSize:9.5, color:"#566070", marginTop:3 }}>
+        <div style={{ fontSize:11, color:"#8A9CAA", marginTop:3 }}>
           100 BH – 329 AH · One unified timeline · Drag/swipe to scroll · Pinch or Ctrl+Scroll to zoom · ± buttons to zoom · Click any bar · ▶ expand companions
         </div>
       </div>
@@ -890,16 +890,16 @@ export default function ShiaTimeline() {
           <button key={k} onClick={()=>setFilter(k)} style={{
             background:filter===k?c:"rgba(255,255,255,0.04)",
             border:`1px solid ${filter===k?c:"rgba(255,255,255,0.1)"}`,
-            color:filter===k?"#06080F":c, padding:"3px 11px", borderRadius:20,
-            fontSize:10, cursor:"pointer", fontWeight:filter===k?700:400,
+            color:filter===k?"#06080F":c, padding:"4px 13px", borderRadius:20,
+            fontSize:12, cursor:"pointer", fontWeight:filter===k?700:400,
             letterSpacing:"0.04em", transition:"all 0.2s", WebkitTapHighlightColor:"transparent"
           }}>{lbl}</button>
         ))}
         <div style={{ display:"flex", gap:4, marginLeft:4 }}>
           {[["−","out"],["＋","in"]].map(([s,d])=>(
-            <button key={d} onClick={()=>doZoom(d)} style={{ width:27,height:27,borderRadius:7,fontSize:16, background:"rgba(184,146,74,0.12)",border:"1px solid rgba(184,146,74,0.28)",color:"#C9A06A",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer" }}>{s}</button>
+            <button key={d} onClick={()=>doZoom(d)} style={{ width:32,height:32,borderRadius:7,fontSize:18, background:"rgba(184,146,74,0.12)",border:"1px solid rgba(184,146,74,0.28)",color:"#C9A06A",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer" }}>{s}</button>
           ))}
-          <span style={{ padding:"0 8px",height:27,lineHeight:"27px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,fontSize:10,color:"#7A8C9A" }}>{Math.round(zoom*100)}%</span>
+          <span style={{ padding:"0 8px",height:32,lineHeight:"32px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,fontSize:12,color:"#9AAABB" }}>{Math.round(zoom*100)}%</span>
         </div>
       </div>
 
@@ -915,8 +915,8 @@ export default function ShiaTimeline() {
           ["#9B7BC4","◉","Occultation"],
           ["#aaa","▶","Tap bar to expand companions"],
         ].map(([c,sym,lbl])=>(
-          <span key={lbl} style={{ display:"flex",alignItems:"center",gap:4,fontSize:9.5,color:"#6A7C8A" }}>
-            <span style={{ color:c,fontSize:11 }}>{sym}</span>{lbl}
+          <span key={lbl} style={{ display:"flex",alignItems:"center",gap:4,fontSize:11,color:"#8A9CAA" }}>
+            <span style={{ color:c,fontSize:13 }}>{sym}</span>{lbl}
           </span>
         ))}
       </div>
@@ -953,7 +953,7 @@ export default function ShiaTimeline() {
                     <div style={{ position:"absolute",bottom:0,left:0,width:1,height:isMajor?14:isMid?9:5,background:isMajor?"rgba(184,146,74,0.8)":"rgba(184,146,74,0.3)" }}/>
                     {(isMajor||isMid||zoom>2)&&(
                       /* Tick labels sit BELOW the axis so they never overlap event labels above */
-                      <div style={{ position:"absolute",top:4,left:y===1?-26:y<0?-14:2,fontSize:isMajor?10:8,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.85)":"rgba(184,146,74,0.45)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
+                      <div style={{ position:"absolute",top:4,left:y===1?-26:y<0?-14:2,fontSize:isMajor?11:9,color:y===1?"#7EB8C9":isMajor?"rgba(184,146,74,0.95)":"rgba(184,146,74,0.65)",whiteSpace:"nowrap",fontWeight:y===1?700:400,letterSpacing:"0.04em" }}>
                         {y===1?"1 AH · Hijra ✦":ahLabel(y)}
                       </div>
                     )}
@@ -1004,11 +1004,11 @@ export default function ShiaTimeline() {
                           >
                             {barW>14&&(
                               <div style={{ position:"absolute",left:stickyLeft,top:0,bottom:0,display:"flex",alignItems:"center",gap:3,
-                                fontSize:isComp?7:zoom>2?9:8,color:`${color}cc`,whiteSpace:"nowrap",letterSpacing:"0.02em",transition:"left 0.04s linear"
+                                fontSize:isComp?9:zoom>2?11:10,color:`${color}ee`,whiteSpace:"nowrap",letterSpacing:"0.02em",transition:"left 0.04s linear"
                               }}>
                                 {item.type==="masoom"&&d.ashaab&&d.ashaab.length>0&&filter==="all"&&(
                                   <span onClick={e=>{e.stopPropagation();toggleExpand(d.id);}}
-                                    style={{fontSize:7,color:`${color}ee`,cursor:"pointer",
+                                    style={{fontSize:9,color:`${color}ee`,cursor:"pointer",
                                       pointerEvents:"all",userSelect:"none",
                                       WebkitTapHighlightColor:"transparent",paddingRight:2}}>
                                     {expanded.has(d.id)?"▼":"▶"}
@@ -1061,7 +1061,7 @@ export default function ShiaTimeline() {
                                 userSelect:"none", zIndex:4,
                               }}
                             >
-                              <span style={{fontSize:7,color:`${color}${expanded.has(d.id)?"cc":"88"}`,letterSpacing:"0.05em"}}>
+                              <span style={{fontSize:9,color:`${color}${expanded.has(d.id)?"dd":"aa"}`,letterSpacing:"0.05em"}}>
                                 {expanded.has(d.id)?"▲ hide companions":`▼ ${d.ashaab.length} companions`}
                               </span>
                             </div>
@@ -1090,12 +1090,12 @@ export default function ShiaTimeline() {
                     {showLabel&&(
                       <div onClick={()=>setSel({...ev,_type:"event"})} style={{
                         position:"absolute",left:ex,top:ev.labelY,transform:"translateX(-50%)",
-                        width:isHigh?95:78,textAlign:"center",fontSize:isHigh?9:7.5,
-                        color:isHigh?ev.color:`${ev.color}BB`,lineHeight:1.3,cursor:"pointer",
-                        fontWeight:isHigh?700:400,zIndex:7,letterSpacing:"0.02em"
+                        width:isHigh?105:88,textAlign:"center",fontSize:isHigh?11:9.5,
+                        color:isHigh?ev.color:`${ev.color}DD`,lineHeight:1.3,cursor:"pointer",
+                        fontWeight:isHigh?700:500,zIndex:7,letterSpacing:"0.02em"
                       }}>
                         {ev.label}
-                        {zoom>=2.5&&<div style={{ fontSize:7,color:`${ev.color}66`,marginTop:1 }}>{ev.hdate}</div>}
+                        {zoom>=2.5&&<div style={{ fontSize:9,color:`${ev.color}99`,marginTop:1 }}>{ev.hdate}</div>}
                       </div>
                     )}
                   </div>
@@ -1116,8 +1116,8 @@ export default function ShiaTimeline() {
       <div style={{ display:"flex",justifyContent:"center",gap:18,padding:"4px 16px 12px",flexWrap:"wrap" }}>
         {[["14","Masoomeen (AS)"],["12","Family Personalities"],["52","Companions & Deputies"],["40","Historical Events"]].map(([n,l])=>(
           <div key={l} style={{ textAlign:"center" }}>
-            <div style={{ fontSize:15,color:"#F5C842" }}>{n}</div>
-            <div style={{ fontSize:8,color:"#6A7C8A",textTransform:"uppercase",letterSpacing:"0.07em" }}>{l}</div>
+            <div style={{ fontSize:17,color:"#F5C842" }}>{n}</div>
+            <div style={{ fontSize:10,color:"#8A9CAA",textTransform:"uppercase",letterSpacing:"0.07em" }}>{l}</div>
           </div>
         ))}
       </div>
@@ -1128,52 +1128,52 @@ export default function ShiaTimeline() {
           <div onClick={e=>e.stopPropagation()} style={{ background:"linear-gradient(145deg,#0E1120 0%,#08090F 100%)",border:`1px solid ${(sel.color||"#C9A96E")}44`,borderRadius:16,padding:26,maxWidth:520,width:"100%",boxShadow:`0 32px 90px rgba(0,0,0,0.8), 0 0 50px ${(sel.color||"#C9A96E")}0A`,maxHeight:"88vh",overflowY:"auto" }}>
             <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12,marginBottom:12 }}>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:9,letterSpacing:"0.3em",textTransform:"uppercase",color:sel.color||"#C9A96E",marginBottom:4 }}>
+                <div style={{ fontSize:11,letterSpacing:"0.3em",textTransform:"uppercase",color:sel.color||"#C9A96E",marginBottom:4 }}>
                   {sel._type==="event"?"Historical Event"
                     :sel.group==="masoom"?(sel.imamNo?`Imam ${sel.imamNo} of 12`:sel.id==="prophet"?"The Holy Prophet ﷺ":"Masoomah (AS)")
                     :sel.group==="family"?"Ahl al-Bayt Family"
                     :"Companion (Sahaabi)"}
                 </div>
-                <h2 style={{ margin:0,fontSize:17,fontWeight:400,color:"#EEE4D2",lineHeight:1.3 }}>{sel.label||sel.full}</h2>
-                {sel.role&&<div style={{ fontSize:11,color:`${sel.color||"#C9A96E"}99`,marginTop:3 }}>{sel.role}</div>}
+                <h2 style={{ margin:0,fontSize:20,fontWeight:400,color:"#EEE4D2",lineHeight:1.3 }}>{sel.label||sel.full}</h2>
+                {sel.role&&<div style={{ fontSize:13,color:`${sel.color||"#C9A96E"}CC`,marginTop:4 }}>{sel.role}</div>}
               </div>
-              <button onClick={()=>setSel(null)} style={{ width:28,height:28,flexShrink:0,borderRadius:7,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",color:"#8a9bb0",cursor:"pointer",fontSize:13 }}>✕</button>
+              <button onClick={()=>setSel(null)} style={{ width:36,height:36,flexShrink:0,borderRadius:8,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",color:"#AABBC8",cursor:"pointer",fontSize:16 }}>✕</button>
             </div>
-            {sel.arabic&&<div style={{ textAlign:"right",direction:"rtl",fontSize:14,color:`${sel.color||"#C9A96E"}77`,fontFamily:"serif",marginBottom:12,paddingBottom:10,borderBottom:"1px solid rgba(255,255,255,0.06)" }}>{sel.arabic}</div>}
+            {sel.arabic&&<div style={{ textAlign:"right",direction:"rtl",fontSize:17,color:`${sel.color||"#C9A96E"}AA`,fontFamily:"serif",marginBottom:12,paddingBottom:10,borderBottom:"1px solid rgba(255,255,255,0.1)" }}>{sel.arabic}</div>}
             <div style={{ display:"flex",gap:8,flexWrap:"wrap",marginBottom:12 }}>
               {sel._type==="person"?(<>
-                {(sel.birthH||sel.birthAH!=null)&&<div style={{ padding:"5px 10px",background:"rgba(94,196,138,0.09)",border:"1px solid rgba(94,196,138,0.22)",borderRadius:8,fontSize:11 }}>
-                  <div style={{ color:"#5EC48A",fontSize:8,marginBottom:2 }}>BIRTH</div>
-                  <span style={{ color:"#D8CCBA" }}>{sel.birthH||ahLabel(sel.birthAH)}</span>
-                  {sel.birthCE&&!sel.birthH?.includes("CE")&&<span style={{ color:"#5A6A78",marginLeft:6 }}>{sel.birthCE}</span>}
+                {(sel.birthH||sel.birthAH!=null)&&<div style={{ padding:"7px 12px",background:"rgba(94,196,138,0.09)",border:"1px solid rgba(94,196,138,0.28)",borderRadius:8,fontSize:13 }}>
+                  <div style={{ color:"#5EC48A",fontSize:10,marginBottom:3 }}>BIRTH</div>
+                  <span style={{ color:"#E8DCCC" }}>{sel.birthH||ahLabel(sel.birthAH)}</span>
+                  {sel.birthCE&&!sel.birthH?.includes("CE")&&<span style={{ color:"#7A8A98",marginLeft:6 }}>{sel.birthCE}</span>}
                 </div>}
-                {(sel.deathH||sel.deathAH!=null)&&sel.deathType!=="occultation"&&<div style={{ padding:"5px 10px",background:`rgba(${sel.deathType==="martyrdom"?"230,57,70":"212,168,67"},0.09)`,border:`1px solid rgba(${sel.deathType==="martyrdom"?"230,57,70":"212,168,67"},0.22)`,borderRadius:8,fontSize:11 }}>
-                  <div style={{ color:sel.deathType==="martyrdom"?"#E63946":"#D4A843",fontSize:8,marginBottom:2 }}>
+                {(sel.deathH||sel.deathAH!=null)&&sel.deathType!=="occultation"&&<div style={{ padding:"7px 12px",background:`rgba(${sel.deathType==="martyrdom"?"230,57,70":"212,168,67"},0.09)`,border:`1px solid rgba(${sel.deathType==="martyrdom"?"230,57,70":"212,168,67"},0.28)`,borderRadius:8,fontSize:13 }}>
+                  <div style={{ color:sel.deathType==="martyrdom"?"#E63946":"#D4A843",fontSize:10,marginBottom:3 }}>
                     {sel.deathType==="martyrdom"?"SHAHADAT":"WAFAT"}
                   </div>
-                  <span style={{ color:"#D8CCBA" }}>{sel.deathH||ahLabel(sel.deathAH)}</span>
+                  <span style={{ color:"#E8DCCC" }}>{sel.deathH||ahLabel(sel.deathAH)}</span>
                 </div>}
-                {sel.age&&<div style={{ padding:"5px 10px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8,fontSize:11 }}>
-                  <div style={{ color:"#6A7C8A",fontSize:8,marginBottom:2 }}>AGE</div>
-                  <span style={{ color:"#D8CCBA" }}>~{sel.age} years</span>
+                {sel.age&&<div style={{ padding:"7px 12px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:8,fontSize:13 }}>
+                  <div style={{ color:"#8A9CAA",fontSize:10,marginBottom:3 }}>AGE</div>
+                  <span style={{ color:"#E8DCCC" }}>~{sel.age} years</span>
                 </div>}
               </>):(<>
-                <div style={{ padding:"5px 10px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,fontSize:11 }}>
-                  <div style={{ color:"#6A7C8A",fontSize:8,marginBottom:2 }}>HIJRI DATE</div>
-                  <span style={{ color:"#D8CCBA" }}>{sel.hdate}</span>
+                <div style={{ padding:"7px 12px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:8,fontSize:13 }}>
+                  <div style={{ color:"#8A9CAA",fontSize:10,marginBottom:3 }}>HIJRI DATE</div>
+                  <span style={{ color:"#E8DCCC" }}>{sel.hdate}</span>
                 </div>
-                <div style={{ padding:"5px 10px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,fontSize:11 }}>
-                  <div style={{ color:"#6A7C8A",fontSize:8,marginBottom:2 }}>CE DATE</div>
-                  <span style={{ color:"#D8CCBA" }}>{sel.ce}</span>
+                <div style={{ padding:"7px 12px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:8,fontSize:13 }}>
+                  <div style={{ color:"#8A9CAA",fontSize:10,marginBottom:3 }}>CE DATE</div>
+                  <span style={{ color:"#E8DCCC" }}>{sel.ce}</span>
                 </div>
               </>)}
             </div>
-            <p style={{ fontSize:13,lineHeight:1.85,color:"#A0B2BE",margin:0 }}>{sel.detail}</p>
+            <p style={{ fontSize:15,lineHeight:1.9,color:"#C8D8E2",margin:0 }}>{sel.detail}</p>
             {sel.shrine&&!sel.shrine.includes("Occultation")&&(
-              <div style={{ marginTop:12,padding:"7px 11px",background:"rgba(184,146,74,0.07)",border:"1px solid rgba(184,146,74,0.18)",borderRadius:8,fontSize:12,color:"#C9A96E" }}>⬡ Shrine: {sel.shrine}</div>
+              <div style={{ marginTop:14,padding:"9px 13px",background:"rgba(184,146,74,0.08)",border:"1px solid rgba(184,146,74,0.25)",borderRadius:8,fontSize:13,color:"#D4B07A" }}>⬡ Shrine: {sel.shrine}</div>
             )}
             {sel.deathType==="occultation"&&(
-              <div style={{ marginTop:10,padding:"7px 11px",background:"rgba(123,91,196,0.08)",border:"1px solid rgba(123,91,196,0.2)",borderRadius:8,fontSize:12,color:"#9B7BC4" }}>◉ Imam al-Mahdi (AJ) is alive, in occultation, and will reappear (Zuhur) to fill the earth with justice.</div>
+              <div style={{ marginTop:12,padding:"9px 13px",background:"rgba(123,91,196,0.08)",border:"1px solid rgba(123,91,196,0.25)",borderRadius:8,fontSize:13,color:"#B09BE0" }}>◉ Imam al-Mahdi (AJ) is alive, in occultation, and will reappear (Zuhur) to fill the earth with justice.</div>
             )}
           </div>
         </div>

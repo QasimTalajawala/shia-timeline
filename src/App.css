@@ -1,5 +1,6 @@
 #root {
   max-width: 1280px;
+  width: 100%;        /* fill body width so layout is viewport-constrained */
   margin: 0 auto;
   padding: 0;
   text-align: center;

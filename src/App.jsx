@@ -600,7 +600,12 @@ export default function ShiaTimeline() {
   const pendingScrollRef = useRef(null); // desired scrollLeft to apply after zoom re-render
 
   useEffect(()=>{
-    const m=()=>{ if(vpRef.current) setVpW(vpRef.current.clientWidth); };
+    // Use window.innerWidth (not vpRef DOM width) — the DOM width expands with content
+    // and creates a circular measurement. window.innerWidth is always the true viewport.
+    const m=()=>{
+      const outerPad = 24; // mainLayout padding: 12px each side
+      setVpW(Math.max(296, Math.min(window.innerWidth, 1280) - outerPad));
+    };
     m(); window.addEventListener("resize",m);
     return ()=>window.removeEventListener("resize",m);
   },[]);
@@ -926,7 +931,7 @@ export default function ShiaTimeline() {
             onMouseMove={e=>{ if(drag.current.active&&outerRef.current) outerRef.current.scrollLeft=drag.current.sl0+drag.current.x0-e.clientX; }}
             onMouseUp={()=>{ drag.current.active=false; }}
             onMouseLeave={()=>{ drag.current.active=false; }}
-            style={{ overflowX:"scroll", overflowY:"hidden", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH }}
+            style={{ overflowX:"scroll", overflowY:"hidden", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch", position:"relative", border:"1px solid rgba(184,146,74,0.12)", borderLeft:"none", borderRadius:"0 10px 10px 0", background:"rgba(255,255,255,0.007)", cursor:drag.current.active?"grabbing":"grab", userSelect:"none", touchAction:"pan-y", height:canvasH, width:vpW, maxWidth:"100%" }}
           >
             <div style={{ width:tlW, height:canvasH, position:"relative" }}>
 

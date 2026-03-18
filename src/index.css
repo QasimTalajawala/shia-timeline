@@ -28,6 +28,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  width: 100%;        /* prevent body from expanding beyond viewport */
+  overflow-x: hidden;
 }
 
 h1 {

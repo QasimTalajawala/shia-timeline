@@ -593,6 +593,8 @@ export default function ShiaTimeline() {
   const [sel, setSel]         = useState(null);
   const [expanded, setExpanded] = useState(new Set());
   const [filter, setFilter]   = useState("all");
+  const [measureMode, setMeasureMode] = useState(false);
+  const [measurePts, setMeasurePts]   = useState([]); // up to 2 AH values
   const drag   = useRef({ active:false, x0:0, y0:0, prevY:0, off0:0, dir:null });
   const pinch  = useRef({ active:false, d0:0, z0:1, pivot:0 });
   const handRef = useRef({}); // always-current state snapshot for imperative handlers
@@ -901,6 +903,15 @@ export default function ShiaTimeline() {
           ))}
           <span style={{ padding:"0 8px",height:32,lineHeight:"32px",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:7,fontSize:12,color:"#9AAABB" }}>{Math.round(zoom*100)}%</span>
         </div>
+        <button
+          onClick={()=>{ setMeasureMode(m=>!m); setMeasurePts([]); }}
+          style={{ height:32, padding:"0 13px", borderRadius:7, fontSize:12,
+            background:measureMode?"rgba(245,200,66,0.18)":"rgba(255,255,255,0.04)",
+            border:`1px solid ${measureMode?"rgba(245,200,66,0.55)":"rgba(255,255,255,0.1)"}`,
+            color:measureMode?"#F5C842":"#8A9CAA", cursor:"pointer",
+            letterSpacing:"0.03em", WebkitTapHighlightColor:"transparent" }}>
+          📏 {measureMode?"Exit Measure":"Measure"}
+        </button>
       </div>
 
       {/* Legend */}
@@ -1101,6 +1112,77 @@ export default function ShiaTimeline() {
                   </div>
                 );
               })}
+
+              {/* ── MEASURE OVERLAY ── */}
+              {measureMode&&(()=>{
+                const ahToCE = ah => Math.round(622 + ah * 0.9702);
+                const [ptA, ptB] = measurePts;
+                const xA = ptA!=null ? xOf(ptA) : null;
+                const xB = ptB!=null ? xOf(ptB) : null;
+                const minX = xA!=null&&xB!=null ? Math.min(xA,xB) : null;
+                const maxX = xA!=null&&xB!=null ? Math.max(xA,xB) : null;
+                const diffAH = ptA!=null&&ptB!=null ? Math.abs(ptB-ptA) : null;
+                const diffCE = diffAH!=null ? Math.round(diffAH*0.9702) : null;
+                const fromAH = ptA!=null&&ptB!=null ? Math.min(ptA,ptB) : null;
+                const toAH   = ptA!=null&&ptB!=null ? Math.max(ptA,ptB) : null;
+                return (
+                  <>
+                    {/* Click-capture overlay */}
+                    <div style={{ position:"absolute",inset:0,zIndex:22,cursor:"crosshair" }}
+                      onClick={e=>{
+                        const rect=e.currentTarget.getBoundingClientRect();
+                        const px=e.clientX-rect.left;
+                        const ah=(px/tlW)*SPAN+MIN_AH;
+                        setMeasurePts(prev=>prev.length>=2?[ah]:[...prev,ah]);
+                      }}
+                    />
+                    {/* Point A marker */}
+                    {xA!=null&&(
+                      <>
+                        <div style={{ position:"absolute",left:xA,top:0,width:2,height:canvasH,background:"rgba(245,200,66,0.85)",pointerEvents:"none",zIndex:23 }}/>
+                        <div style={{ position:"absolute",left:xA+5,top:6,fontSize:11,color:"#F5C842",background:"rgba(6,8,16,0.9)",padding:"2px 7px",borderRadius:5,pointerEvents:"none",zIndex:24,whiteSpace:"nowrap",border:"1px solid rgba(245,200,66,0.3)" }}>
+                          A · {ahLabel(Math.round(ptA))} ({ahToCE(ptA)} CE)
+                        </div>
+                      </>
+                    )}
+                    {/* Point B marker */}
+                    {xB!=null&&(
+                      <>
+                        <div style={{ position:"absolute",left:xB,top:0,width:2,height:canvasH,background:"rgba(245,200,66,0.85)",pointerEvents:"none",zIndex:23 }}/>
+                        <div style={{ position:"absolute",left:xB+5,top:30,fontSize:11,color:"#F5C842",background:"rgba(6,8,16,0.9)",padding:"2px 7px",borderRadius:5,pointerEvents:"none",zIndex:24,whiteSpace:"nowrap",border:"1px solid rgba(245,200,66,0.3)" }}>
+                          B · {ahLabel(Math.round(ptB))} ({ahToCE(ptB)} CE)
+                        </div>
+                      </>
+                    )}
+                    {/* Highlighted span band */}
+                    {minX!=null&&(
+                      <div style={{ position:"absolute",left:minX,top:0,width:maxX-minX,height:canvasH,background:"rgba(245,200,66,0.06)",borderLeft:"2px dashed rgba(245,200,66,0.45)",borderRight:"2px dashed rgba(245,200,66,0.45)",pointerEvents:"none",zIndex:21 }}/>
+                    )}
+                    {/* Measurement badge */}
+                    {diffAH!=null&&(
+                      <div style={{ position:"absolute",left:(minX+maxX)/2,top:AXIS_H/2-36,transform:"translateX(-50%)",background:"rgba(8,10,20,0.97)",border:"1px solid rgba(245,200,66,0.5)",borderRadius:12,padding:"10px 18px",textAlign:"center",pointerEvents:"none",zIndex:25,whiteSpace:"nowrap",boxShadow:"0 4px 24px rgba(0,0,0,0.6)" }}>
+                        <div style={{ fontSize:22,fontWeight:700,color:"#F5C842",letterSpacing:"0.02em" }}>{Math.round(diffAH)} AH years</div>
+                        <div style={{ fontSize:13,color:"#C8A86A",marginTop:2 }}>≈ {diffCE} CE years</div>
+                        <div style={{ fontSize:11,color:"#7A8C9A",marginTop:4 }}>
+                          {ahLabel(Math.round(fromAH))} ({ahToCE(fromAH)} CE) → {ahLabel(Math.round(toAH))} ({ahToCE(toAH)} CE)
+                        </div>
+                        <div style={{ fontSize:10,color:"#4A5A68",marginTop:4 }}>tap anywhere to measure again</div>
+                      </div>
+                    )}
+                    {/* Instruction hint (before any point is set) */}
+                    {ptA==null&&(
+                      <div style={{ position:"absolute",left:"50%",top:AXIS_H/2-20,transform:"translateX(-50%)",background:"rgba(8,10,20,0.9)",border:"1px solid rgba(245,200,66,0.3)",borderRadius:10,padding:"8px 16px",fontSize:12,color:"#C9A96E",pointerEvents:"none",zIndex:25,whiteSpace:"nowrap" }}>
+                        📏 Tap point A on the timeline
+                      </div>
+                    )}
+                    {ptA!=null&&ptB==null&&(
+                      <div style={{ position:"absolute",left:"50%",top:AXIS_H/2-20,transform:"translateX(-50%)",background:"rgba(8,10,20,0.9)",border:"1px solid rgba(245,200,66,0.3)",borderRadius:10,padding:"8px 16px",fontSize:12,color:"#C9A96E",pointerEvents:"none",zIndex:25,whiteSpace:"nowrap" }}>
+                        📏 Now tap point B
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
             </div>
           </div>
